@@ -1,0 +1,75 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'krishan@millionskart.com';
+    }
+
+    function isApproved() {
+      return request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.approved == true;
+    }
+
+    // Fields that only admin can write — users can never self-assign these
+    function touchesProtectedFields() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['approved', 'approvalStatus', 'role', 'uid', 'email', 'createdAt']);
+    }
+
+    // ── Users ──────────────────────────────────────────────────────────────
+    match /users/{uid} {
+
+      // CREATE: Only on signup, only for your own UID, approved must be false
+      allow create: if isOwner(uid)
+        && request.resource.data.approved == false
+        && request.resource.data.approvalStatus == 'pending'
+        && request.resource.data.keys().hasAll([
+             'uid', 'email', 'displayName', 'role',
+             'approvalStatus', 'approved', 'xp'
+           ]);
+
+      // READ: Own doc always; any approved user can read others (leaderboard); admin reads all
+      allow read: if isOwner(uid) || isApproved() || isAdmin();
+
+      // UPDATE: Admin can update any field (approve, reject, role changes)
+      //         Approved users can update their own doc BUT cannot touch protected fields
+      allow update: if isAdmin()
+        || (isOwner(uid) && isApproved() && !touchesProtectedFields());
+
+      // DELETE: Admin only
+      allow delete: if isAdmin();
+    }
+
+    // ── Assessments ────────────────────────────────────────────────────────
+    match /assessments/{attemptId} {
+
+      // CREATE: Approved users can submit their own attempts only
+      allow create: if isApproved()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll([
+             'userId', 'chapterId', 'attemptNumber',
+             'score', 'passed', 'answers', 'wrongQuestionIds'
+           ]);
+
+      // READ: Users read their own attempts; admin reads all
+      allow read: if isAdmin()
+        || (isApproved() && resource.data.userId == request.auth.uid);
+
+      // UPDATE / DELETE: Admin only — attempts are immutable for users
+      allow update, delete: if isAdmin();
+    }
+  }
+}
