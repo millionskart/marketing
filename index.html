@@ -4,220 +4,158 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MK Marketing Academy</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCFHe6PXb5nu1En-zcWksJoaID9Ixxw2dg",
+    authDomain: "millions-marketing-academy.firebaseapp.com",
+    databaseURL: "https://millions-marketing-academy-default-rtdb.firebaseio.com",
+    projectId: "millions-marketing-academy",
+    storageBucket: "millions-marketing-academy.firebasestorage.app",
+    messagingSenderId: "557425756011",
+    appId: "1:557425756011:web:f471cccd333528ee5cee2e"
+  });
+  const db = firebase.database();
+</script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #ffffff;
-    --bg-subtle: #f8f9fa;
-    --bg-hover: #f1f3f5;
-    --border: #e5e7eb;
-    --border-strong: #d1d5db;
-    --text: #0f172a;
-    --text-secondary: #64748b;
-    --text-tertiary: #94a3b8;
-    --accent: #2563eb;
-    --accent-light: #eff6ff;
-    --accent-hover: #1d4ed8;
-    --success: #16a34a;
-    --success-light: #f0fdf4;
-    --error: #dc2626;
-    --error-light: #fef2f2;
-    --warning: #d97706;
-    --warning-light: #fffbeb;
-    --locked: #9ca3af;
-    --radius: 8px;
-    --radius-lg: 12px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
-    --shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
-    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
-
-  /* AUTH */
-  #auth-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; background: var(--bg-subtle); }
-  .auth-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 48px 40px; width: 420px; box-shadow: var(--shadow-lg); }
-  .auth-logo { display:flex; align-items:center; gap:10px; margin-bottom:32px; }
-  .auth-logo-mark { width:36px; height:36px; background: var(--accent); border-radius: 8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:15px; }
-  .auth-logo-text { font-size:17px; font-weight:600; color: var(--text); }
-  .auth-logo-sub { font-size:12px; color: var(--text-secondary); margin-top:1px; }
-  .auth-title { font-size:22px; font-weight:700; margin-bottom:6px; }
-  .auth-subtitle { color: var(--text-secondary); font-size:14px; margin-bottom:28px; }
-  .field { margin-bottom:16px; }
-  .field label { display:block; font-size:13px; font-weight:500; margin-bottom:6px; color: var(--text); }
-  .field input { width:100%; padding:10px 14px; border:1px solid var(--border-strong); border-radius: var(--radius); font-size:14px; font-family:var(--font); outline:none; transition:border 0.15s; background:var(--bg); color:var(--text); }
-  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-  .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 18px; border-radius: var(--radius); font-size:14px; font-weight:500; cursor:pointer; border:none; transition:all 0.15s; font-family:var(--font); }
-  .btn:disabled { opacity:0.45; cursor:not-allowed; }
-  .btn-primary { background: var(--accent); color:#fff; width:100%; padding:11px; font-size:15px; }
-  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
-  .btn-secondary { background: var(--bg); border:1px solid var(--border-strong); color: var(--text); }
-  .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); }
-  .btn-sm { padding:7px 13px; font-size:13px; width:auto; }
-  .btn-danger { background: var(--error); color:#fff; }
-  .btn-danger:hover:not(:disabled) { background: #b91c1c; }
-  .btn-success { background: var(--success); color:#fff; }
-  .btn-success:hover:not(:disabled) { background: #15803d; }
-  .auth-toggle { text-align:center; margin-top:20px; font-size:13px; color: var(--text-secondary); }
-  .auth-toggle a { color: var(--accent); cursor:pointer; font-weight:500; }
-  .auth-msg { border-radius: var(--radius); padding:10px 14px; font-size:13px; margin-bottom:16px; }
-  .auth-msg.error { background: var(--error-light); border:1px solid #fecaca; color: var(--error); }
-  .auth-msg.success { background: var(--success-light); border:1px solid #86efac; color: var(--success); }
-  .auth-tabs { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:24px; }
-  .auth-tab { padding:8px 0; margin-right:24px; font-size:14px; font-weight:500; cursor:pointer; color: var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.15s; }
-  .auth-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-  /* APP SHELL */
-  #app { display:none; height:100vh; overflow:hidden; flex-direction:column; }
-  .topbar { height:56px; border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:12px; flex-shrink:0; background:var(--bg); position:relative; z-index:10; }
-  .topbar-logo { display:flex; align-items:center; gap:8px; }
-  .topbar-logo-mark { width:28px; height:28px; background: var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
-  .topbar-logo-name { font-size:14px; font-weight:600; }
-  .topbar-divider { width:1px; height:20px; background:var(--border); margin:0 4px; }
-  .topbar-section { font-size:13px; color: var(--text-secondary); }
-  .topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
-  .user-badge { display:flex; align-items:center; gap:8px; }
-  .user-avatar { width:28px; height:28px; border-radius:50%; background: var(--accent-light); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color: var(--accent); }
-  .user-name { font-size:13px; font-weight:500; }
-  .user-role { font-size:11px; color: var(--text-tertiary); }
-  .layout { display:flex; flex:1; overflow:hidden; }
-
-  /* SIDEBAR */
-  .sidebar { width:260px; border-right:1px solid var(--border); background: var(--bg-subtle); overflow-y:auto; flex-shrink:0; padding:12px 0; display:flex; flex-direction:column; }
-  .sidebar-section-label { padding:8px 16px 4px; font-size:11px; font-weight:600; color: var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; }
-  .chapter-item { padding:8px 14px; margin:1px 8px; border-radius: var(--radius); cursor:pointer; display:flex; align-items:center; gap:10px; transition:background 0.1s; }
-  .chapter-item:hover:not(.locked-item) { background: var(--bg-hover); }
-  .chapter-item.active { background: var(--accent-light); }
-  .chapter-item.locked-item { cursor:not-allowed; opacity:0.5; }
-  .chapter-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
-  .chapter-icon.unlocked { background:var(--accent-light); }
-  .chapter-icon.locked { background:var(--bg-hover); }
-  .chapter-icon.completed { background:var(--success-light); }
-  .chapter-icon.active-icon { background:var(--accent); }
-  .chapter-meta { flex:1; min-width:0; }
-  .chapter-name { font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .chapter-item.active .chapter-name { color: var(--accent); font-weight:600; }
-  .chapter-status { font-size:11px; color: var(--text-tertiary); margin-top:1px; }
-  .chapter-status.passed { color: var(--success); }
-  .chapter-status.locked-st { color: var(--locked); }
-  .sidebar-bottom { padding:16px; border-top:1px solid var(--border); margin-top:auto; }
-  .progress-label { font-size:12px; color: var(--text-secondary); margin-bottom:6px; display:flex; justify-content:space-between; }
-  .progress-bar { height:4px; background: var(--border); border-radius:99px; overflow:hidden; }
-  .progress-fill { height:100%; background: var(--accent); border-radius:99px; transition:width 0.4s ease; }
-  .sidebar-nav-item { padding:8px 14px; margin:1px 8px; border-radius:var(--radius); cursor:pointer; display:flex; align-items:center; gap:8px; font-size:13px; color: var(--text-secondary); transition:background 0.1s; }
-  .sidebar-nav-item:hover { background:var(--bg-hover); color:var(--text); }
-  .sidebar-nav-item.active { background:var(--bg-hover); color:var(--text); font-weight:500; }
-
-  /* CONTENT */
-  .content { flex:1; overflow-y:auto; padding:40px 48px; }
-  .content-inner { max-width:720px; }
-  .page-eyebrow { font-size:12px; font-weight:600; color: var(--accent); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
-  .page-title { font-size:28px; font-weight:700; line-height:1.25; margin-bottom:8px; }
-  .page-subtitle { font-size:15px; color: var(--text-secondary); margin-bottom:32px; line-height:1.6; }
-  .divider { height:1px; background: var(--border); margin:32px 0; }
-  .card { background: var(--bg); border:1px solid var(--border); border-radius: var(--radius-lg); padding:24px; margin-bottom:16px; }
-  .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:99px; font-size:12px; font-weight:500; }
-  .badge-blue { background: var(--accent-light); color: var(--accent); }
-  .badge-green { background: var(--success-light); color: var(--success); }
-  .badge-orange { background: var(--warning-light); color: var(--warning); }
-  .badge-gray { background: var(--bg-hover); color: var(--text-secondary); }
-  .badge-red { background: var(--error-light); color: var(--error); }
-
-  /* CHAPTER */
-  .notion-link-card { display:flex; align-items:center; gap:14px; padding:14px 18px; border:1px solid var(--border); border-radius: var(--radius); background:var(--bg-subtle); margin-bottom:10px; transition:border 0.15s; cursor:pointer; }
-  .notion-link-card:hover { border-color: var(--accent); }
-  .notion-link-title { font-size:14px; font-weight:500; }
-  .notion-link-sub { font-size:12px; color: var(--text-tertiary); margin-top:2px; }
-  .start-test-cta { background: var(--accent-light); border:1.5px solid var(--accent); border-radius: var(--radius-lg); padding:24px 28px; margin-top:32px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
-  .already-passed { background: var(--success-light); border:1.5px solid #86efac; border-radius: var(--radius-lg); padding:20px 24px; margin-top:32px; display:flex; align-items:flex-start; gap:16px; }
-
-  /* TEST */
-  .test-progress-bar { height:4px; background:var(--border); border-radius:99px; margin-bottom:28px; overflow:hidden; }
-  .test-progress-fill { height:100%; background: var(--accent); border-radius:99px; transition:width 0.3s; }
-  .question-num { font-size:12px; font-weight:600; color: var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; }
-  .question-text { font-size:17px; font-weight:600; line-height:1.5; margin-bottom:24px; }
-  .options-list { display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
-  .option-item { padding:14px 18px; border:1.5px solid var(--border); border-radius: var(--radius); cursor:pointer; font-size:14px; transition:all 0.15s; display:flex; align-items:flex-start; gap:12px; line-height:1.5; }
-  .option-item:hover { border-color: var(--accent); background: var(--accent-light); }
-  .option-item.selected { border-color: var(--accent); background: var(--accent-light); }
-  .option-letter { width:22px; height:22px; border-radius:50%; border:1.5px solid var(--border-strong); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; flex-shrink:0; margin-top:1px; }
-  .option-item.selected .option-letter { border-color: var(--accent); color: var(--accent); }
-  .test-nav { display:flex; justify-content:space-between; align-items:center; }
-
-  /* RESULT */
-  .result-card { text-align:center; padding:40px 32px; }
-  .result-score { font-size:56px; font-weight:800; line-height:1; margin:16px 0 8px; }
-  .result-score.pass { color: var(--success); }
-  .result-score.fail { color: var(--error); }
-  .result-details { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:28px; }
-  .result-stat { background:var(--bg-subtle); border-radius: var(--radius); padding:14px; text-align:center; }
-  .result-stat-val { font-size:20px; font-weight:700; }
-  .result-stat-lab { font-size:12px; color: var(--text-secondary); margin-top:2px; }
-
-  /* ADMIN */
-  .admin-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:28px; }
-  .admin-tab { padding:10px 0; margin-right:24px; font-size:14px; font-weight:500; cursor:pointer; color: var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.15s; }
-  .admin-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .table { width:100%; border-collapse:collapse; font-size:14px; }
-  .table th { text-align:left; padding:10px 14px; font-size:12px; font-weight:600; color: var(--text-secondary); background:var(--bg-subtle); border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:0.04em; }
-  .table td { padding:12px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
-  .table tr:last-child td { border-bottom:none; }
-  .table tr:hover td { background:var(--bg-subtle); }
-  .progress-mini { display:flex; align-items:center; gap:8px; }
-  .progress-mini-bar { flex:1; height:6px; background:var(--border); border-radius:99px; overflow:hidden; }
-  .progress-mini-fill { height:100%; background: var(--accent); border-radius:99px; }
-  .invite-form { background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; margin-bottom:24px; }
-  .inline-msg { font-size:13px; padding:8px 12px; border-radius:var(--radius); margin-top:10px; }
-  .inline-msg.success { background:var(--success-light); color:var(--success); }
-  .inline-msg.error { background:var(--error-light); color:var(--error); }
-  .chapter-pills { display:flex; gap:4px; flex-wrap:wrap; margin-top:6px; }
-  .chapter-pill { width:24px; height:24px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; }
-  .pill-pass { background:var(--success-light); color:var(--success); }
-  .pill-fail { background:var(--error-light); color:var(--error); }
-  .pill-none { background:var(--bg-hover); color:var(--text-tertiary); }
-  .empty-state { text-align:center; padding:48px 24px; color:var(--text-secondary); font-size:14px; }
-  select { padding:9px 13px; border:1px solid var(--border-strong); border-radius:var(--radius); font-size:14px; font-family:var(--font); outline:none; background:var(--bg); color:var(--text); cursor:pointer; width:100%; }
-  select:focus { border-color:var(--accent); }
-  @media(max-width:768px) {
-    .sidebar { display:none; }
-    .content { padding:24px 20px; }
-    .result-details { grid-template-columns:1fr 1fr; }
-    .auth-card { width:calc(100vw - 32px); padding:32px 24px; }
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg-subtle:#f8f9fa;--bg-hover:#f1f3f5;
+  --border:#e5e7eb;--border-strong:#d1d5db;
+  --text:#0f172a;--text-secondary:#64748b;--text-tertiary:#94a3b8;
+  --accent:#2563eb;--accent-light:#eff6ff;--accent-hover:#1d4ed8;
+  --success:#16a34a;--success-light:#f0fdf4;
+  --error:#dc2626;--error-light:#fef2f2;
+  --warning:#d97706;--warning-light:#fffbeb;
+  --locked:#9ca3af;--radius:8px;--radius-lg:12px;
+  --shadow-lg:0 4px 16px rgba(0,0,0,0.10);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg-subtle)}
+.auth-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:48px 40px;width:420px;box-shadow:var(--shadow-lg)}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.auth-logo-mark{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px}
+.auth-logo-text{font-size:17px;font-weight:600}.auth-logo-sub{font-size:12px;color:var(--text-secondary);margin-top:1px}
+.auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:24px}
+.auth-tab{padding:8px 0;margin-right:24px;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.auth-msg{border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-bottom:16px}
+.auth-msg.error{background:var(--error-light);border:1px solid #fecaca;color:var(--error)}
+.auth-msg.success{background:var(--success-light);border:1px solid #86efac;color:var(--success)}
+.field{margin-bottom:16px}.field label{display:block;font-size:13px;font-weight:500;margin-bottom:6px}
+.field input{width:100%;padding:10px 14px;border:1px solid var(--border-strong);border-radius:var(--radius);font-size:14px;font-family:var(--font);outline:none;transition:border 0.15s;background:var(--bg);color:var(--text)}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:var(--font)}
+.btn:disabled{opacity:0.45;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff;width:100%;padding:11px;font-size:15px}.btn-primary:hover:not(:disabled){background:var(--accent-hover)}
+.btn-secondary{background:var(--bg);border:1px solid var(--border-strong);color:var(--text)}.btn-secondary:hover:not(:disabled){background:var(--bg-hover)}
+.btn-sm{padding:7px 13px;font-size:13px;width:auto}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover:not(:disabled){background:#15803d}
+.btn-danger{background:var(--error);color:#fff}.btn-danger:hover:not(:disabled){background:#b91c1c}
+#app{display:none;height:100vh;overflow:hidden;flex-direction:column}
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;background:var(--bg);z-index:10}
+.topbar-logo{display:flex;align-items:center;gap:8px}
+.topbar-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+.topbar-logo-name{font-size:14px;font-weight:600}
+.topbar-divider{width:1px;height:20px;background:var(--border);margin:0 4px}
+.topbar-section{font-size:13px;color:var(--text-secondary)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent-light);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--accent)}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:260px;border-right:1px solid var(--border);background:var(--bg-subtle);overflow-y:auto;flex-shrink:0;padding:12px 0;display:flex;flex-direction:column}
+.sidebar-label{padding:8px 16px 4px;font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em}
+.ch-item{padding:8px 14px;margin:1px 8px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.1s}
+.ch-item:hover:not(.locked-item){background:var(--bg-hover)}.ch-item.active{background:var(--accent-light)}.ch-item.locked-item{cursor:not-allowed;opacity:0.5}
+.ch-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ch-icon.u{background:var(--accent-light)}.ch-icon.l{background:var(--bg-hover)}.ch-icon.d{background:var(--success-light)}.ch-icon.a{background:var(--accent)}
+.ch-meta{flex:1;min-width:0}.ch-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-item.active .ch-name{color:var(--accent);font-weight:600}.ch-status{font-size:11px;color:var(--text-tertiary);margin-top:1px}
+.ch-status.passed{color:var(--success)}.ch-status.locked{color:var(--locked)}
+.nav-item{padding:8px 14px;margin:1px 8px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);transition:background 0.1s}
+.nav-item:hover{background:var(--bg-hover);color:var(--text)}.nav-item.active{background:var(--bg-hover);color:var(--text);font-weight:500}
+.sidebar-bottom{padding:16px;border-top:1px solid var(--border);margin-top:auto}
+.prog-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;background:var(--accent);border-radius:99px;transition:width 0.4s ease}
+.content{flex:1;overflow-y:auto;padding:40px 48px}.ci{max-width:720px}
+.eyebrow{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+.page-title{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.page-sub{font-size:15px;color:var(--text-secondary);margin-bottom:32px;line-height:1.6}
+.divider{height:1px;background:var(--border);margin:32px 0}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:500}
+.badge-blue{background:var(--accent-light);color:var(--accent)}.badge-green{background:var(--success-light);color:var(--success)}
+.badge-orange{background:var(--warning-light);color:var(--warning)}.badge-gray{background:var(--bg-hover);color:var(--text-secondary)}
+.notion-card{display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);margin-bottom:10px;transition:border 0.15s;cursor:pointer}
+.notion-card:hover{border-color:var(--accent)}
+.test-cta{background:var(--accent-light);border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:24px 28px;margin-top:32px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.passed-banner{background:var(--success-light);border:1.5px solid #86efac;border-radius:var(--radius-lg);padding:20px 24px;margin-top:32px;display:flex;align-items:flex-start;gap:16px}
+.t-prog{height:4px;background:var(--border);border-radius:99px;margin-bottom:28px;overflow:hidden}
+.t-prog-fill{height:100%;background:var(--accent);border-radius:99px;transition:width 0.3s}
+.q-num{font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+.q-text{font-size:17px;font-weight:600;line-height:1.5;margin-bottom:24px}
+.opts{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.opt{padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;transition:all 0.15s;display:flex;align-items:flex-start;gap:12px;line-height:1.5}
+.opt:hover{border-color:var(--accent);background:var(--accent-light)}.opt.sel{border-color:var(--accent);background:var(--accent-light)}
+.opt-ltr{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
+.opt.sel .opt-ltr{border-color:var(--accent);color:var(--accent)}
+.test-nav{display:flex;justify-content:space-between;align-items:center}
+.res-card{text-align:center;padding:40px 32px}
+.res-score{font-size:56px;font-weight:800;line-height:1;margin:16px 0 8px}
+.res-score.pass{color:var(--success)}.res-score.fail{color:var(--error)}
+.res-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+.res-stat{background:var(--bg-subtle);border-radius:var(--radius);padding:14px;text-align:center}
+.res-stat-val{font-size:20px;font-weight:700}.res-stat-lab{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.adm-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:28px}
+.adm-tab{padding:10px 0;margin-right:24px;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s}
+.adm-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;padding:10px 14px;font-size:12px;font-weight:600;color:var(--text-secondary);background:var(--bg-subtle);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.04em}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}.tbl tr:hover td{background:var(--bg-subtle)}
+.pm{display:flex;align-items:center;gap:8px}.pm-bar{flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden}
+.pm-fill{height:100%;background:var(--accent);border-radius:99px}
+.pills{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.pill{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.pill-p{background:var(--success-light);color:var(--success)}.pill-f{background:var(--error-light);color:var(--error)}.pill-n{background:var(--bg-hover);color:var(--text-tertiary)}
+.inv-form{background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:24px}
+.imsg{font-size:13px;padding:8px 12px;border-radius:var(--radius);margin-top:10px}
+.imsg.s{background:var(--success-light);color:var(--success)}.imsg.e{background:var(--error-light);color:var(--error)}
+.empty{text-align:center;padding:48px 24px;color:var(--text-secondary);font-size:14px}
+select{padding:9px 13px;border:1px solid var(--border-strong);border-radius:var(--radius);font-size:14px;font-family:var(--font);outline:none;background:var(--bg);color:var(--text);cursor:pointer;width:100%}
+select:focus{border-color:var(--accent)}
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-secondary);font-size:14px}
 </style>
 </head>
 <body>
 
-<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
       <div class="auth-logo-mark">MK</div>
-      <div>
-        <div class="auth-logo-text">Millions Kart</div>
-        <div class="auth-logo-sub">Marketing Academy</div>
-      </div>
+      <div><div class="auth-logo-text">Millions Kart</div><div class="auth-logo-sub">Marketing Academy</div></div>
     </div>
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login')">Sign in</div>
-      <div class="auth-tab" onclick="switchAuthTab('signup')">Create account</div>
+      <div class="auth-tab active" onclick="switchTab('login')">Sign in</div>
+      <div class="auth-tab" onclick="switchTab('signup')">Create account</div>
     </div>
     <div id="auth-msg" style="display:none"></div>
     <div id="login-form">
-      <div class="field"><label>Email address</label><input type="email" id="login-email" placeholder="you@millionskart.com" onkeydown="if(event.key==='Enter')handleLogin()"></div>
-      <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')handleLogin()"></div>
-      <button class="btn btn-primary" onclick="handleLogin()">Sign in →</button>
+      <div class="field"><label>Email</label><input type="email" id="le" placeholder="you@millionskart.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>Password</label><input type="password" id="lp" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign in →</button>
     </div>
     <div id="signup-form" style="display:none">
-      <div class="field"><label>Full name</label><input type="text" id="signup-name" placeholder="Your full name"></div>
-      <div class="field"><label>Email address</label><input type="email" id="signup-email" placeholder="you@millionskart.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="signup-password" placeholder="Choose a password (min 6 chars)"></div>
-      <button class="btn btn-primary" onclick="handleSignup()">Create account →</button>
-      <p style="font-size:12px;color:var(--text-tertiary);margin-top:12px;line-height:1.6;">Your account needs admin approval before you can access course content.</p>
+      <div class="field"><label>Full name</label><input type="text" id="sn" placeholder="Your full name"></div>
+      <div class="field"><label>Email</label><input type="email" id="se" placeholder="you@millionskart.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="sp" placeholder="Min 6 characters"></div>
+      <button class="btn btn-primary" onclick="doSignup()">Create account →</button>
+      <p style="font-size:12px;color:var(--text-tertiary);margin-top:12px;line-height:1.6">Your account needs admin approval before you can access course content.</p>
     </div>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="topbar">
     <div class="topbar-logo">
@@ -225,792 +163,644 @@
       <div class="topbar-logo-name">Marketing Academy</div>
     </div>
     <div class="topbar-divider"></div>
-    <div class="topbar-section" id="topbar-section">Dashboard</div>
+    <div class="topbar-section" id="ts">Dashboard</div>
     <div class="topbar-right">
-      <div class="user-badge">
-        <div class="user-avatar" id="topbar-avatar">?</div>
-        <div>
-          <div class="user-name" id="topbar-name">—</div>
-          <div class="user-role" id="topbar-role">—</div>
-        </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="user-avatar" id="ua">?</div>
+        <div><div style="font-size:13px;font-weight:500" id="un">—</div><div style="font-size:11px;color:var(--text-tertiary)" id="ur">—</div></div>
       </div>
-      <button class="btn btn-secondary btn-sm" onclick="handleLogout()">Sign out</button>
+      <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
     </div>
   </div>
   <div class="layout">
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-section-label">Navigation</div>
-      <div class="sidebar-nav-item active" id="nav-dashboard" onclick="showDashboard()">🏠 Dashboard</div>
-      <div class="sidebar-nav-item" id="nav-admin" onclick="showAdmin()" style="display:none">⚙️ Admin Panel</div>
-      <div class="sidebar-section-label" style="margin-top:12px">Chapters</div>
-      <div id="sidebar-chapters"></div>
-      <div class="sidebar-bottom" id="sidebar-bottom" style="display:none">
-        <div class="progress-label">
-          <span>Your progress</span>
-          <span id="progress-text">0 / 5</span>
+    <div class="sidebar">
+      <div class="sidebar-label">Navigation</div>
+      <div class="nav-item active" id="nav-dash" onclick="showDash()">🏠 Dashboard</div>
+      <div class="nav-item" id="nav-admin" onclick="showAdmin()" style="display:none">⚙️ Admin Panel</div>
+      <div class="sidebar-label" style="margin-top:12px">Chapters</div>
+      <div id="sb-chapters"></div>
+      <div class="sidebar-bottom" id="sb-bottom" style="display:none">
+        <div style="font-size:12px;color:var(--text-secondary);display:flex;justify-content:space-between">
+          <span>Your progress</span><span id="prog-txt">0 / 5</span>
         </div>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
       </div>
     </div>
-    <div class="content">
-      <div class="content-inner" id="content-inner"></div>
-    </div>
+    <div class="content"><div class="ci" id="ci"></div></div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// CHAPTERS DATA
-// ═══════════════════════════════════════════
-const CHAPTERS = [
-  {
-    id:1, emoji:'🍎', title:'ABC of Digital Marketing', subtitle:'Chapter 1',
-    desc:'The foundational layer. Learn what performance marketing really means, the 5 awareness levels, good vs bad marketing, the complete purchase journey, and every core metric your team needs to know.',
-    topics:['What is Performance Marketing','5 Awareness Levels','Good vs Bad Marketing','The Marketing Funnel','Cold vs Warm Traffic','Core Metrics: RoAS, CAC, CTR, CVR, MER, LTV','MK Brand Split: MC vs Peeperly'],
-    notionLink:'https://app.notion.com/p/Ch-1-ABC-of-Digital-Marketing-1986e4ff58a2805aa165ff3dabb44290',
-    questions:[
-      {q:"What does 'performance marketing' mean?",opts:["Using only social media to market products","Every rupee spent is tracked and measured against a specific result — unlike TV/billboards where you can't measure exact sales","Running paid ads on Meta and Google only","Marketing performed live in front of an audience"],ans:1},
-      {q:"What is MK's single north star objective?",opts:["Get as many orders as possible regardless of cost","Build the most followers on Instagram","Get sales profitably AND scale the business — both together","Maximise RoAS above 5x at all times"],ans:2},
-      {q:"What is the golden rule of marketing?",opts:["Spend as little as possible on ads","Sell the outcome, not the object","Always offer a discount to convert customers","Target the broadest possible audience"],ans:1},
-      {q:"A customer is scrolling Instagram and hasn't thought about phone cases in months. What awareness level are they at?",opts:["Level 3 — Solution Aware","Level 5 — Most Aware","Level 1 — Unaware","Level 2 — Problem Aware"],ans:2},
-      {q:"What is the correct ad approach for a Level 1 (Unaware) customer?",opts:["Show a discount code immediately","Interrupt with something visually compelling — make them feel something first, don't mention the product immediately","Explain all product features in detail","Retarget them with a direct buy-now CTA"],ans:1},
-      {q:"What does RoAS stand for and what is its formula?",opts:["Return on Ad Spend. Formula: Revenue from ads ÷ Ad Spend","Rate of Ad Success. Formula: Clicks ÷ Impressions","Revenue of Ad Sales. Formula: Total Revenue ÷ Total Orders","Return on All Spend. Formula: Net Profit ÷ Total Costs"],ans:0},
-      {q:"If CAC is ₹400 and profit per order after all costs is ₹300 — what is happening?",opts:["The business is healthy and should scale immediately","The business is losing ₹100 on every customer acquired — unsustainable","The business is breaking even","The business has a 33% profit margin"],ans:1},
-      {q:"What is MER and what does it stand for?",opts:["Meta Efficiency Ratio — Meta's internal quality score","Marketing Efficiency Ratio — Total Revenue ÷ Total Marketing Spend across ALL channels","Maximum Expected Return — target RoAS for any campaign","Monthly Engagement Rate — social media engagement metric"],ans:1},
-      {q:"Why is Peeperly marketed differently from Million Cases?",opts:["Because Peeperly is cheaper","MC targets boys; Peeperly targets girls","Peeperly is a premium play with higher AOV — RoAS degrades at scale, needs brand equity not just performance ads. MC is a volume play with broad audience and direct-response focus.","Peeperly only runs on Google, MC only on Meta"],ans:2},
-      {q:"What are the 3 core objections of every cold traffic customer?",opts:["Price, Colour, Size","I don't know this brand / What if it's bad quality or doesn't fit / Why should I buy right now","Delivery time, Return policy, Payment options","Design, Durability, Discount availability"],ans:1},
-      {q:"What is the difference between CVR and CTR?",opts:["They are the same metric","CTR measures % who clicked the ad; CVR measures % of site visitors who bought","CVR is for Meta; CTR is for Google","CTR measures conversions; CVR measures clicks"],ans:1},
-      {q:"What does a high CTR with a low CVR tell you?",opts:["The targeting is wrong","The ad is promising something the product page isn't delivering — fix the landing page, not the ad","The creative needs to be changed immediately","The audience is too broad"],ans:1},
-      {q:"What are the 3 types of problems a business can have?",opts:["Creative problem, Audience problem, Budget problem","Offer problem, Product problem, Marketing problem","Design problem, Pricing problem, Delivery problem","RoAS problem, CTR problem, CVR problem"],ans:1},
-      {q:"What is Peeperly's approximate AOV range?",opts:["₹299–499","₹650–750","₹1,100–1,200","₹2,000–2,500"],ans:2},
-      {q:"What is the 'Art of the Sale' — the two states every purchase bridges?",opts:["Current Price → Desired Price","Current State (where they are now, the problem/frustration) → Desired State (where they want to be). Your product is the bridge.","Current Product → Desired Product","Current Brand → Desired Brand"],ans:1}
-    ]
-  },
-  {
-    id:2, emoji:'📡', title:'Channels & Platforms', subtitle:'Chapter 2',
-    desc:"Meta Ads, Google, WhatsApp, Email, Influencer Marketing, Native Ads, VSLs, and every channel MK uses — how each works, when to use it, and how to read if it's working.",
-    topics:['Meta Ads — Campaign Structure','CBO vs ABO','Google PMax & Shopping','WhatsApp Automation','Email Flows (Klaviyo)','Influencer Tiers','Native Ads & Advertorials','VSL Structure','Channel Priority Hierarchy'],
-    notionLink:'https://app.notion.com/p/Ch-2-Channels-Platforms-3666e4ff58a28097bdcecd7b40cc9317',
-    questions:[
-      {q:"What is the key difference between Meta and Google from a marketing psychology standpoint?",opts:["Meta is cheaper; Google is more accurate","Meta is a discovery platform — you interrupt people who weren't thinking about your product. Google captures existing intent — people actively searching for what you sell.","Meta works for B2B; Google works for B2C","Meta only works for video; Google only works for text"],ans:1},
-      {q:"What are the three levels of Meta's campaign hierarchy?",opts:["Strategy → Execution → Reporting","Campaign → Ad Set → Ad","Account → Campaign → Creative","Funnel → Audience → Budget"],ans:1},
-      {q:"What does CBO stand for and what does it mean?",opts:["Cost Budget Optimisation — sets cost cap across all ad sets","Campaign Budget Optimisation — budget is set at campaign level and Meta distributes it across ad sets based on performance","Creative Budget Overlap — when two creatives compete","Click-Based Optimisation — Meta optimises for clicks only"],ans:1},
-      {q:"What is the most common reason Meta won't spend on a new ad?",opts:["The ad is too expensive to run","The audience is too large","The hook has no curiosity — it doesn't call out the audience, imply a benefit, or drive curiosity","Meta needs 7 days to approve all new ads"],ans:2},
-      {q:"What are the three primary email automation flows every MK marketer should know?",opts:["Welcome flow, Discount flow, Unsubscribe flow","Post-purchase flow, Win-back flow (dormant customers), New collection launch flow","New customer flow, Loyalty flow, Sale announcement flow","Onboarding flow, Upsell flow, Re-engagement flow"],ans:1},
-      {q:"Why is WhatsApp uniquely powerful in India compared to email?",opts:["WhatsApp is free; email costs money","WhatsApp open rates are 70–80% vs email's 20–25%; Indian customers actively read WhatsApp messages","WhatsApp has better design capabilities than email","WhatsApp integrates directly with Meta Ads"],ans:1},
-      {q:"What is the COD-to-prepaid conversion mechanic on WhatsApp?",opts:["Sending a discount when COD customers try to cancel","A WhatsApp message after a COD order offering an incentive to switch to prepaid, reducing RTO and improving profitability","Converting prepaid customers to COD for better UX","An automated message that confirms COD orders only"],ans:1},
-      {q:"What is the main difference between how you'd write copy for Google Search vs Meta Reels?",opts:["Google ads must be longer; Meta ads must be shorter","Google: direct and clear — the person is already searching. Meta: emotionally compelling, visual-first, pattern interrupt — they weren't thinking about phone cases 5 seconds ago.","Google uses images; Meta uses text only","There is no difference — the same copy works on both"],ans:1},
-      {q:"What is whitelisting in influencer marketing?",opts:["Adding an influencer to your approved vendor list","Running paid ads through an influencer's account — the ad appears native to that person's presence, creating higher trust","Getting an influencer to sign an exclusivity contract","Verifying an influencer's follower count is genuine"],ans:1},
-      {q:"What are the three influencer tiers MK uses?",opts:["Celebrity, Mid-tier, Micro","Gifting, Paid post, Brand ambassador","Collabs (co-creation), Gifting (organic), Revenue Share (commission-based)","Tier 1 cities, Tier 2 cities, Tier 3 cities"],ans:2},
-      {q:"What is an advertorial and why does it convert cold traffic better than a standard product page?",opts:["A paid editorial placement in newspapers","A landing page that looks and reads like editorial content — builds trust by delivering value before selling; cold traffic needs context and trust-building before being shown a buy button","A combination advertisement and tutorial video","An ad that automatically retargets site visitors"],ans:1},
-      {q:"What is the MK channel priority hierarchy — Primary channels?",opts:["Instagram → YouTube → Email","Meta Ads → Google Ads → WhatsApp Retention → Email Flows","Influencer → Organic → Paid","Google Shopping → Meta Reels → WhatsApp"],ans:1},
-      {q:"What is a VSL and when should Peeperly use one?",opts:["Video Sales Letter — a 2–8 minute video that builds trust end-to-end. Use for cold traffic at higher AOV where trust-building is required before conversion.","Very Short Landing page — used when the product page is too long","Viral Social Link — a shareable ad format for organic reach","Video Story Launch — used to announce new collections"],ans:0},
-      {q:"What is 'Creative is the New Targeting' — the 2026 Meta model?",opts:["Creative matters more than budget","Meta's Andromeda algorithm reads the creative itself as the primary targeting signal — not your audience settings. Broad + strong creative outperforms narrow + weak creative every time.","Creating ads that look like organic content","Using AI tools to create more creatives faster"],ans:1},
-      {q:"Why must MK look cross-category for creative inspiration instead of phone case competitors?",opts:["It's against Meta's terms of service","Competitors' ads create higher CPMs because your ad looks like every other ad in the feed — go cross-category instead (skincare, fitness, fashion, gifting)","Competitor research is illegal in India","Phone case competitors don't run good ads"],ans:1}
-    ]
-  },
-  {
-    id:3, emoji:'🎨', title:'Creative Strategy', subtitle:'Chapter 3',
-    desc:'The engine behind everything. Avatar, Angle, Hook, Concept. Creative production systems, the full concept library, testing frameworks, AI production tools, and big brand lessons.',
-    topics:['Avatar → Angle → Hook → Concept Model','Hook Retention Mechanics','Consumer Psychology & Identity Purchasing','The Full Creative Concept Library','Creative Production System','80/20 Iteration Rule','AI-Powered Creative Production','Creative Testing: 48hr & 7-day rules','Big Brand Lessons: BURGA, Casetify, Comfrt'],
-    notionLink:'https://app.notion.com/p/Ch-3-Creative-Strategy-3666e4ff58a280ed9151d7569728cf84',
-    questions:[
-      {q:"What are the four components of the core creative thinking model?",opts:["Brief → Script → Produce → Test","Avatar → Angle → Hook → Concept","Research → Brief → Creative → Launch","Audience → Message → Format → CTA"],ans:1},
-      {q:"What is the 80/20 rule in creative production?",opts:["Spend 80% of budget on creative, 20% on media buying","80% of production time goes to iterations/variations of what's already working; 20% goes to testing entirely new concepts","80% video ads, 20% static images","Test 80 creatives per month, keep only 20"],ans:1},
-      {q:"What does a sharp video retention drop at second 2 tell you?",opts:["The CTA is weak","The offer isn't compelling enough","The visual hook failed — the first frame didn't earn enough attention","The audience is wrong"],ans:2},
-      {q:"After 48 hours, what should you look at — and what should you NOT decide?",opts:["Look at purchases and decide whether to scale","Look at CTR, CPM, Thumb Stop Rate and video retention. Do NOT decide to kill or scale based on purchase data — insufficient at 48 hours.","Look at nothing — wait 30 days for data","Look at CTR and immediately increase budget if above 2%"],ans:1},
-      {q:"What CTR benchmark indicates an exceptional creative at 48 hours?",opts:["Above 0.5%","Above 1%","Above 2.5%","Above 4%"],ans:3},
-      {q:"What is the 'Decoy Effect' in offer psychology?",opts:["Using celebrity images to distract customers from price","Presenting three options where Option C exists to make Option B look like obvious value — e.g. Case ₹1,150 / Case+charm+popsocket ₹1,499 (recommended) / Full set ₹2,199. Most choose the middle.","Creating fake scarcity to trigger urgency","Showing competitor products to make yours look better"],ans:1},
-      {q:"What is 'Hook Retention' — name two retention mechanics?",opts:["Keeping customers coming back to buy — achieved through loyalty programs","The techniques that hold viewer attention after the hook: Open loops (unresolved questions), pacing & pattern interrupts, emotional escalation, visual novelty, reward prediction.","The CTR of a creative across its full lifetime","How long a creative runs before being replaced"],ans:1},
-      {q:"What is the 'Status Signaling' psychological driver for Peeperly?",opts:["Showing high prices to signal quality","Humans use visible possessions as signals of identity and social status. Peeperly customers aren't buying a case — they're buying a signal that says 'I curate my aesthetic and make intentional choices.'","Using celebrity endorsements to signal prestige","Offering premium packaging to signal quality"],ans:1},
-      {q:"What is the Comfrt Archive principle?",opts:["Archiving old creatives after 30 days to save budget","Every piece of content a creator makes is raw material — the archive is a coalmine where you find diamonds. Most won't perform but exceptional content gets repurposed as paid ads.","Compressing creative files for faster delivery","Keeping a library of competitor ads"],ans:1},
-      {q:"What is creative fatigue — name 3 signs?",opts:["When the creative team is overworked","When the audience has seen the same ad too many times: frequency above 3.5–4 on cold audiences, CTR declining week-over-week, CPP increasing despite stable budget","When a creative concept becomes outdated culturally","When CTR is below 1% on any ad"],ans:1},
-      {q:"What are the three creative tiers in the creative scaling system?",opts:["Good, Better, Best","Tier 1: Proven winners (60% of budget) / Tier 2: Testing creatives (30%) / Tier 3: Concepts in production (pipeline)","Short-form, Long-form, Static","TOFU, MOFU, BOFU creatives"],ans:1},
-      {q:"What is 'Tribal Identity' as a purchase driver for Peeperly?",opts:["Targeting customers based on their geographic region","Humans organise into tribes of shared values and aesthetics. Peeperly has the opportunity to build a tribe — women who believe their phone should match their life. Tribal belonging creates loyalty that pricing can't compete with.","Marketing to group buyers or wholesale customers","Creating a loyalty program with tiered membership levels"],ans:1},
-      {q:"What is a Pixar-style AI ad and why does it stop the scroll?",opts:["A highly polished, expensive animated brand film","An AI-generated animated ad where the viewer's brain pattern-matches it as content (not an ad) — so the critical 3-second drop-off window passes before they realise it's commercial","A cartoon mascot used in brand identity","A Meta ad format launched by Pixar and Meta together"],ans:1},
-      {q:"What is the Lisa → Aisha framework shift?",opts:["Lisa and Aisha are two different target markets for Peeperly","Health products use pain-driven frameworks (chronic suffering). Phone cases trigger identity tensions — the Aisha framework shifts from Pain→Villain→Solution to Identity Gap→Trigger Moment→Transformation","The Lisa framework was created for Western markets; Aisha is India-specific","Both frameworks are identical — product category doesn't matter"],ans:1},
-      {q:"Name the 5 Hook Retention Mechanisms in order?",opts:["Hook, Script, Visual, Audio, CTA","Open Loop, Pacing & Pattern Interrupts, Emotional Escalation, Visual Novelty, Reward Prediction","Awareness, Interest, Desire, Action, Retention","AIDA, BAB, PASTOR, SSS, PPPP"],ans:1}
-    ]
-  },
-  {
-    id:4, emoji:'📊', title:'Performance Analysis & Scaling', subtitle:'Chapter 4',
-    desc:"Reading campaigns like a surgeon. The full metrics architecture, campaign diagnosis decision tree, three scaling strategies, budget architecture, cohort analysis, offer engineering, and the marketing myths every senior marketer must unlearn.",
-    topics:['The Metrics Architecture','RoAS vs MER vs Incrementality','Campaign Diagnosis Decision Tree','Three Scaling Strategies','Budget Architecture','Customer Cohort Analysis','Post-Purchase Communication System','Offer Strategy','Marketing Myths & Uncomfortable Truths','Performance FAQ: CPM, CTR, CVR, ATC'],
-    notionLink:'https://app.notion.com/p/Ch-4-Performance-Analysis-Scaling-3666e4ff58a280b69654f189537d855b',
-    questions:[
-      {q:"What is the core mental model for reading performance numbers?",opts:["Every number is an instruction — act on it immediately","Every number is a symptom — your job is to find the disease. Don't treat symptoms, trace upstream to root cause.","Numbers don't matter — only revenue matters","Check numbers daily and make one change per day"],ans:1},
-      {q:"What is the critical difference between RoAS and MER?",opts:["RoAS is for Meta; MER is for Google","RoAS is reported by Meta — only counts Meta-attributed revenue. MER is Total Revenue ÷ Total Marketing Spend across ALL channels. MER is the truth; RoAS is one channel's self-reported story.","RoAS includes shipping costs; MER doesn't","They are the same metric, just calculated differently"],ans:1},
-      {q:"What is Incrementality and why does it matter more than RoAS?",opts:["The total number of incremental orders per month","Whether a channel or campaign CAUSED purchases to happen. Retargeting may show 3x RoAS but if most buyers would have bought anyway — the true incremental value is near zero.","How quickly a campaign scales","The difference in performance between new and existing creatives"],ans:1},
-      {q:"What are the three scaling strategies?",opts:["Test → Validate → Scale","Vertical Scaling (increase budget on winning campaign) → Horizontal Scaling (expand to new audiences with same creative) → Creative Scaling (find more winners)","Day 1 → Week 1 → Month 1","TOFU scaling → MOFU scaling → BOFU scaling"],ans:1},
-      {q:"What is the correct budget increase percentage for vertical scaling and how often?",opts:["Double the budget every 24 hours when performance is good","Maximum 20–30% increase every 48–72 hours — larger increases trigger Meta's learning phase reset","10% increase per day continuously","50% increase per week when CPP is below target"],ans:1},
-      {q:"What is the 'Retargeting Illusion' and why is it dangerous?",opts:["Retargeting campaigns that use the wrong creative format","Retargeting claims credit for purchases that would have happened organically anyway — making CPAs look artificially strong. Teams over-invest in retargeting while wasting budget on conversions that didn't need the ad.","Showing retargeting ads to the wrong audience segment","Retargeting that runs for too long, causing frequency issues"],ans:1},
-      {q:"What is the first external check to make BEFORE diagnosing a CPP spike?",opts:["Check if the Meta algorithm has updated","Check inventory — is the best-selling design out of stock? This is the most commonly misdiagnosed issue at MK. A stockout can double CPP within 48 hours with zero marketing change.","Check if competitors have launched new ads","Check if the creative has been running for more than 30 days"],ans:1},
-      {q:"What is CM2 and why is a negative CM2 a critical problem?",opts:["Creative metric 2 — measuring second-stage creative performance","Contribution Margin 2 = CM1 minus all variable marketing spend. If CM2 is negative, you're buying orders at a loss — scaling will deepen the loss, not fix it.","Customer Multiplier 2 — the expected repeat purchase multiplier","Campaign Metric 2 — the second most important KPI"],ans:1},
-      {q:"Which of these 'Marketing Myths' is TRUE?",opts:["Higher RoAS always means a healthier business","A great creative fixes bad unit economics","Viral content equals profitable business","Great creative can hide bad unit economics for months — but when it fatigues, the underlying bad economics become suddenly visible"],ans:3},
-      {q:"What is the Cash Conversion Cycle problem in COD-heavy D2C?",opts:["The time it takes for COD refunds to process","The time between paying for inventory and receiving cash from customers (3–5 weeks for MK's COD model). Doubling ad spend requires double inventory outlay weeks before revenue arrives — scaling can create a cash crunch even on profitable unit economics.","The conversion rate of COD orders to prepaid","How long customers take to decide between COD and prepaid"],ans:1},
-      {q:"What is Cohort 6 'Discount-Driven Buyer' and the correct strategy?",opts:["Customers who buy twice during discount periods — give them exclusive deals","Customers who consistently purchase only during sales/with coupon codes. Strategy: use for inventory clearance ONLY. Never send them new collection launches. Track LTV separately — it's measurably lower.","High-value customers who deserve the best discounts as a reward","New customers who need a first-purchase discount to convert"],ans:1},
-      {q:"What is the 'Zero Conversion Day' and the correct response?",opts:["Immediately change the creative and increase the budget","A day where an otherwise-healthy campaign shows zero conversions. Usually caused by attribution window mismatch, day-of-week effect, or Meta's exploration behaviour — NOT campaign failure. Correct response: Do nothing if 1 day in a profitable week.","Pause the campaign and contact Meta support","It means the campaign is dead — kill it and start fresh"],ans:1},
-      {q:"What does the MK Growth Flywheel show and what are the two main brakes?",opts:["How to increase ad spend efficiently — brakes are high CPM and low CTR","How product quality → UGC → organic reach → better CTR → lower CPM → more orders → more reviews → stronger pixel → better LALs → lower CAC — a compounding system. Main brakes: High RTO (broken delivery loop) and Discount Conditioning (prevents organic word-of-mouth).","How to structure the marketing team — brakes are lack of budget and poor hiring","How Peeperly and MC share marketing resources"],ans:1},
-      {q:"What does the Post-Purchase COD pre-delivery sequence achieve?",opts:["It confirms order details and asks for prepayment — recovers 5% of lost orders","Two WhatsApp messages (dispatch day + day before delivery) confirming COD amount and offering rescheduling. Reduces RTO by 5–8 percentage points. At 2,000 orders/day, 5% RTO reduction = ₹50,000/day = ₹1.5 Crore/month recovered.","It sends tracking information and reduces support contacts by 20%","It converts COD customers to prepaid — saving 15% on payment gateway fees"],ans:1},
-      {q:"What are the two most important fields in the Offer Brief?",opts:["Hook and Visual","Margin Check (ensures no financially destructive offer launches) and Hypothesis (creates accountability — compare result against prediction to build offer intelligence over time).","SKU and Pricing","Deliverables and Timeline"],ans:1}
-    ]
-  },
-  {
-    id:5, emoji:'👑', title:'Brand Thinking & Senior Judgment', subtitle:'Chapter 5',
-    desc:'The strategic layer. Brand identity, positioning, competitive intelligence, the 7 audience questions, the 8-figure brand blueprint, and the growth flywheel. For team leads and brand heads.',
-    topics:['Tactic vs Strategy','Brand DNA for MC & Peeperly','Competitive Positioning Matrix','The 7 Audience Questions','Retention as Profit','8-Figure Brand Blueprint','The Marketplace Strategy','The MK Growth Flywheel','Senior Operator Weekly Routine'],
-    notionLink:'https://app.notion.com/p/Ch-5-Brand-Thinking-Sr-Judgment-3676e4ff58a280f58730e19c95bf9782',
-    questions:[
-      {q:"What is the difference between a tactic and a strategy?",opts:["Tactics are expensive; strategies are free","A tactic answers 'what are we doing today?' A strategy answers 'why are we doing this and does it move us toward a goal that matters?' Teams that operate only at tactical level are always busy and always behind.","Tactics are for junior staff; strategies are for seniors","Tactics are short-term ads; strategies are long-term brand campaigns"],ans:1},
-      {q:"What is a 'brand' — the real definition?",opts:["A logo, color palette, and font system","A set of associations that live in your customer's mind — everything she believes, feels, and expects when she encounters your name, before she sees a single product or reads a word of copy","The company's mission and vision statements","The advertising campaigns and marketing materials a company produces"],ans:1},
-      {q:"What is Peeperly's most defensible positioning territory?",opts:["The cheapest premium option competing with Amazon","Same positioning as BURGA — global premium lifestyle","The premium, design-led, women-specific phone case brand in India — a space no Indian brand currently owns at scale.","The best-value phone case for all demographics"],ans:2},
-      {q:"What are Steve Jobs' most important marketing principles referenced in Chapter 5?",opts:["Always advertise on TV and hire the best agencies","We have to be really clear on what we want them to know about us — communicate values (who it's for, what it stands for), NOT speeds, feeds, specs, or why we're better than competitors.","Focus on product features and technical superiority","Spend 10x more on marketing than any competitor"],ans:1},
-      {q:"What is the 8-Figure Brand Blueprint step most brands skip?",opts:["Step 1: Find a product that sells well online","Step 5: Build LTV BEFORE scaling hard. Most brands find a winning ad, crank spend, ride the RoAS wave — then Meta fluctuates and there's no backend. Brands that can outbid everyone have the highest LTV.","Step 3: Hire a large marketing team immediately","Step 6: Go viral on Instagram before spending on paid ads"],ans:1},
-      {q:"What does 'Creative is the New Targeting' mean for MK's Meta strategy?",opts:["Creative matters more than budget","Meta's algorithm reads the creative itself as the primary targeting signal. Strong creative finds its own audience. The media buyer's job shifts from audience architect to creative systems operator.","Creating ads that look like organic content to avoid being detected","Using AI tools to create more creatives faster at lower cost"],ans:1},
-      {q:"What are the two brakes on the MK Growth Flywheel and the correct fix for each?",opts:["High CPM (fix: reduce budget) and Low CTR (fix: change creative)","High RTO (brake on UGC loop — fix: GoKwik RTO controls + pre-delivery WhatsApp) and Discount Conditioning (brake on word-of-mouth — fix: limit discount campaigns to 4/year for MC, 2/year for Peeperly)","Poor design (fix: hire better designers) and Slow delivery (fix: change logistics)","Low Instagram followers (fix: influencer seeding) and Weak email list (fix: pop-up forms)"],ans:1},
-      {q:"What is the LTV:CAC ratio that defines a 'real, sustainably growing business'?",opts:["1:1 — you spend what you earn","2:1 — you earn twice what you spend","3:1 or above — this is the threshold where compounding growth becomes possible","5:1 — the higher the better with no upper limit"],ans:2},
-      {q:"Answer all 4 brand clarity questions for Peeperly:",opts:["Build for revenue; known for cases; must run ads; must learn Shopify","Build to be India's #1 premium women's phone case brand; known for treating the phone as an intentional identity accessory; must execute editorial Instagram + micro-influencer army + premium unboxing; must build cohort LTV data and email/WhatsApp retention infrastructure","Build to compete with Casetify; known for Indian designs; must expand to Amazon; must learn SEO","Build for Tier 1 cities only; known for affordable premium; must hire influencers; must learn TikTok"],ans:1},
-      {q:"What is the Marketplace Strategy for Peeperly vs MC?",opts:["Both brands should be listed on all marketplaces at the same price as D2C","MC: Marketplaces are a volume and discovery channel. Peeperly: selective presence on PREMIUM marketplaces (Myntra, Nykaa Fashion) where editorial context supports premium pricing. Non-negotiable for both: D2C price at parity with or lower than marketplace.","Neither brand should be on marketplaces — it hurts D2C brand building","Both brands should lead with marketplace before D2C to build volume first"],ans:1},
-      {q:"What does the senior marketer's Monday routine look like?",opts:["Post on LinkedIn, check Instagram analytics, review team performance","9AM: Full performance dashboard. 9:30AM: Scale decisions. 10AM: Creative pipeline review. 10:30AM: Inventory alignment. 11AM: Flag issues to relevant teams. Wednesday mid-week check. Friday creative brief day.","Weekly team meeting, budget review, then plan next week's ads","Check CPP once, adjust budgets if needed, brief new creatives"],ans:1},
-      {q:"What is the Congruence Principle and how does it affect conversion rate?",opts:["All team members must agree on brand direction before any campaign launches","Ad-to-page message match. If the ad makes a specific promise and the landing page doesn't continue that exact conversation — trust drops immediately. Matching page type to audience temperature can move CVR from 0.8% to 7%.","All brand communications must use the same logo and color palette","The brand's Instagram aesthetic must match its Meta ad aesthetic exactly"],ans:1},
-      {q:"Complete this from the eCom Library: 'You don't need a new idea. You need to...'",opts:["...spend more money on proven channels","...identify what's already proven and build a genuinely superior version of it. GENUINELY — clearly, undeniably superior.","...hire a better creative team than your competitors","...copy what's working in Western markets and adapt for India"],ans:1},
-      {q:"What is the 7 Audience Questions framework — answer Q7 for Peeperly?",opts:["7 demographic questions about age, city, income","A framework for deep customer knowledge. Q7 for Peeperly: What problems does Peeperly solve? The gap between ₹99 Amazon generic cases (bad quality, boring design) and ₹3,500+ Casetify (too expensive). Peeperly owns the 'genuinely good design at accessible premium price' space.","7 questions about purchasing behaviour and cart size","Questions asked in customer surveys to improve product quality"],ans:1},
-      {q:"What is the single most important strategic priority for MK in the next 12 months?",opts:["Hire 50 more people to the marketing team","Build the systems and data infrastructure: LTV tracking, cohort analysis, post-purchase communication flows, RTO reduction, and brand equity investment for Peeperly — without these, additional ad spend just exposes the weakness of the flywheel's other components faster.","Double the Meta ad spend across both brands immediately","Launch both brands internationally in UAE and US markets"],ans:1}
-    ]
-  }
+// ─── CHAPTERS DATA ───────────────────────────────────────────
+const CHS = [
+  {id:1,e:'🍎',t:'ABC of Digital Marketing',s:'Chapter 1',
+   desc:'The foundational layer. Performance marketing, 5 awareness levels, good vs bad marketing, the complete purchase journey, and every core metric your team needs to know.',
+   topics:['What is Performance Marketing','5 Awareness Levels','Good vs Bad Marketing','The Marketing Funnel','Cold vs Warm Traffic','Core Metrics: RoAS, CAC, CTR, CVR, MER, LTV','MC vs Peeperly Brand Split'],
+   link:'https://app.notion.com/p/Ch-1-ABC-of-Digital-Marketing-1986e4ff58a2805aa165ff3dabb44290',
+   qs:[
+    {q:"What does 'performance marketing' mean?",o:["Using only social media","Every rupee spent is tracked and measured against a specific result — unlike TV/billboards where you can't measure exact sales","Running paid ads on Meta and Google only","Marketing performed live in front of an audience"],a:1},
+    {q:"What is MK's single north star objective?",o:["Get as many orders as possible regardless of cost","Build the most followers on Instagram","Get sales profitably AND scale the business — both together","Maximise RoAS above 5x at all times"],a:2},
+    {q:"What is the golden rule of marketing?",o:["Spend as little as possible on ads","Sell the outcome, not the object","Always offer a discount to convert customers","Target the broadest possible audience"],a:1},
+    {q:"A customer scrolling Instagram hasn't thought about phone cases in months. What awareness level are they at?",o:["Level 3 — Solution Aware","Level 5 — Most Aware","Level 1 — Unaware","Level 2 — Problem Aware"],a:2},
+    {q:"What is the correct ad approach for a Level 1 (Unaware) customer?",o:["Show a discount code immediately","Interrupt with something visually compelling — make them feel something first, don't mention the product immediately","Explain all product features in detail","Retarget them with a direct buy-now CTA"],a:1},
+    {q:"What does RoAS stand for and what is its formula?",o:["Return on Ad Spend. Formula: Revenue from ads ÷ Ad Spend","Rate of Ad Success. Formula: Clicks ÷ Impressions","Revenue of Ad Sales. Formula: Total Revenue ÷ Total Orders","Return on All Spend. Formula: Net Profit ÷ Total Costs"],a:0},
+    {q:"If CAC is ₹400 and profit per order after all costs is ₹300 — what is happening?",o:["The business is healthy and should scale","The business is losing ₹100 on every customer acquired — unsustainable","The business is breaking even","The business has a 33% profit margin"],a:1},
+    {q:"What is MER and what does it stand for?",o:["Meta Efficiency Ratio — Meta's internal quality score","Marketing Efficiency Ratio — Total Revenue ÷ Total Marketing Spend across ALL channels","Maximum Expected Return — target RoAS for any campaign","Monthly Engagement Rate — social media metric"],a:1},
+    {q:"Why is Peeperly marketed differently from Million Cases?",o:["Because Peeperly is cheaper","MC targets boys; Peeperly targets girls","Peeperly is a premium play with higher AOV — RoAS degrades at scale, needs brand equity not just performance ads. MC is a volume play with broad audience and direct-response focus.","Peeperly only runs on Google, MC only on Meta"],a:2},
+    {q:"What are the 3 core objections of every cold traffic customer?",o:["Price, Colour, Size","I don't know this brand / What if it's bad quality or doesn't fit / Why should I buy right now","Delivery time, Return policy, Payment options","Design, Durability, Discount availability"],a:1},
+    {q:"What is the difference between CVR and CTR?",o:["They are the same metric","CTR measures % who clicked the ad; CVR measures % of site visitors who bought","CVR is for Meta; CTR is for Google","CTR measures conversions; CVR measures clicks"],a:1},
+    {q:"What does a high CTR with a low CVR tell you?",o:["The targeting is wrong","The ad is promising something the product page isn't delivering — fix the landing page, not the ad","The creative needs to be changed immediately","The audience is too broad"],a:1},
+    {q:"What are the 3 types of problems a business can have?",o:["Creative, Audience, Budget","Offer problem, Product problem, Marketing problem","Design, Pricing, Delivery","RoAS, CTR, CVR"],a:1},
+    {q:"What is Peeperly's approximate AOV range?",o:["₹299–499","₹650–750","₹1,100–1,200","₹2,000–2,500"],a:2},
+    {q:"What is the 'Art of the Sale' — the two states every purchase bridges?",o:["Current Price → Desired Price","Current State (where they are now, the problem/frustration) → Desired State (where they want to be). Your product is the bridge.","Current Product → Desired Product","Current Brand → Desired Brand"],a:1}
+   ]},
+  {id:2,e:'📡',t:'Channels & Platforms',s:'Chapter 2',
+   desc:"Meta Ads, Google, WhatsApp, Email, Influencer Marketing, Native Ads, VSLs, and every channel MK uses — how each works, when to use it, and how to read if it's working.",
+   topics:['Meta Ads — Campaign Structure','CBO vs ABO','Google PMax & Shopping','WhatsApp Automation','Email Flows','Influencer Tiers','Native Ads & Advertorials','VSL Structure','Channel Priority Hierarchy'],
+   link:'https://app.notion.com/p/Ch-2-Channels-Platforms-3666e4ff58a28097bdcecd7b40cc9317',
+   qs:[
+    {q:"What is the key difference between Meta and Google from a marketing psychology standpoint?",o:["Meta is cheaper; Google is more accurate","Meta is a discovery platform — you interrupt people who weren't thinking about your product. Google captures existing intent — people actively searching for what you sell.","Meta works for B2B; Google works for B2C","Meta only works for video; Google only works for text"],a:1},
+    {q:"What are the three levels of Meta's campaign hierarchy?",o:["Strategy → Execution → Reporting","Campaign → Ad Set → Ad","Account → Campaign → Creative","Funnel → Audience → Budget"],a:1},
+    {q:"What does CBO stand for and what does it mean?",o:["Cost Budget Optimisation — sets cost cap across all ad sets","Campaign Budget Optimisation — budget is set at campaign level and Meta distributes it across ad sets based on performance","Creative Budget Overlap — when two creatives compete","Click-Based Optimisation — Meta optimises for clicks only"],a:1},
+    {q:"What is the most common reason Meta won't spend on a new ad?",o:["The ad is too expensive to run","The audience is too large","The hook has no curiosity — it doesn't call out the audience, imply a benefit, or drive curiosity","Meta needs 7 days to approve all new ads"],a:2},
+    {q:"What are the three primary email automation flows every MK marketer should know?",o:["Welcome flow, Discount flow, Unsubscribe flow","Post-purchase flow, Win-back flow (dormant customers), New collection launch flow","New customer flow, Loyalty flow, Sale announcement flow","Onboarding flow, Upsell flow, Re-engagement flow"],a:1},
+    {q:"Why is WhatsApp uniquely powerful in India compared to email?",o:["WhatsApp is free; email costs money","WhatsApp open rates are 70–80% vs email's 20–25%; Indian customers actively read WhatsApp messages","WhatsApp has better design capabilities than email","WhatsApp integrates directly with Meta Ads"],a:1},
+    {q:"What is the COD-to-prepaid conversion mechanic on WhatsApp?",o:["Sending a discount when COD customers try to cancel","A WhatsApp message after a COD order offering an incentive to switch to prepaid, reducing RTO and improving profitability","Converting prepaid customers to COD for better UX","An automated message that confirms COD orders only"],a:1},
+    {q:"What is the main difference between Google Search copy vs Meta Reels copy?",o:["Google ads must be longer; Meta ads must be shorter","Google: direct and clear — the person is already searching. Meta: emotionally compelling, visual-first, pattern interrupt — they weren't thinking about phone cases 5 seconds ago.","Google uses images; Meta uses text only","There is no difference"],a:1},
+    {q:"What is whitelisting in influencer marketing?",o:["Adding an influencer to your approved vendor list","Running paid ads through an influencer's account — the ad appears native to that person's presence, creating higher trust","Getting an influencer to sign an exclusivity contract","Verifying an influencer's follower count is genuine"],a:1},
+    {q:"What are the three influencer tiers MK uses?",o:["Celebrity, Mid-tier, Micro","Gifting, Paid post, Brand ambassador","Collabs (co-creation), Gifting (organic), Revenue Share (commission-based)","Tier 1 cities, Tier 2 cities, Tier 3 cities"],a:2},
+    {q:"What is an advertorial and why does it convert cold traffic better than a standard product page?",o:["A paid editorial placement in newspapers","A landing page that looks and reads like editorial content — builds trust by delivering value before selling; cold traffic needs context before being shown a buy button","A combination advertisement and tutorial video","An ad that automatically retargets site visitors"],a:1},
+    {q:"What is the MK channel priority hierarchy — Primary channels?",o:["Instagram → YouTube → Email","Meta Ads → Google Ads → WhatsApp Retention → Email Flows","Influencer → Organic → Paid","Google Shopping → Meta Reels → WhatsApp"],a:1},
+    {q:"What is a VSL and when should Peeperly use one?",o:["Video Sales Letter — a 2–8 minute video that builds trust end-to-end. Use for cold traffic at higher AOV where trust-building is required before conversion.","Very Short Landing page — used when the product page is too long","Viral Social Link — a shareable ad format for organic reach","Video Story Launch — used to announce new collections"],a:0},
+    {q:"What does 'Creative is the New Targeting' mean for Meta in 2026?",o:["Creative matters more than budget","Meta's Andromeda algorithm reads the creative itself as the primary targeting signal — not your audience settings. Broad + strong creative outperforms narrow + weak creative every time.","Creating ads that look like organic content","Using AI tools to create more creatives faster"],a:1},
+    {q:"Why must MK look cross-category for creative inspiration instead of phone case competitors?",o:["It's against Meta's terms of service","Competitors' ads create higher CPMs because your ad looks like every other ad in the feed — go cross-category instead (skincare, fitness, fashion, gifting)","Competitor research is illegal in India","Phone case competitors don't run good ads"],a:1}
+   ]},
+  {id:3,e:'🎨',t:'Creative Strategy',s:'Chapter 3',
+   desc:'Avatar, Angle, Hook, Concept. Creative production systems, the full concept library, testing frameworks, AI production tools, consumer psychology, and big brand lessons.',
+   topics:['Avatar → Angle → Hook → Concept','Hook Retention Mechanics','Consumer Psychology & Identity Purchasing','The Full Creative Concept Library','Creative Production System','80/20 Iteration Rule','AI-Powered Creative Production','Creative Testing: 48hr & 7-day rules','Big Brand Lessons'],
+   link:'https://app.notion.com/p/Ch-3-Creative-Strategy-3666e4ff58a280ed9151d7569728cf84',
+   qs:[
+    {q:"What are the four components of the core creative thinking model?",o:["Brief → Script → Produce → Test","Avatar → Angle → Hook → Concept","Research → Brief → Creative → Launch","Audience → Message → Format → CTA"],a:1},
+    {q:"What is the 80/20 rule in creative production?",o:["Spend 80% of budget on creative, 20% on media buying","80% of production time goes to iterations/variations of what's already working; 20% goes to testing entirely new concepts","80% video ads, 20% static images","Test 80 creatives per month, keep only 20"],a:1},
+    {q:"What does a sharp video retention drop at second 2 tell you?",o:["The CTA is weak","The offer isn't compelling enough","The visual hook failed — the first frame didn't earn enough attention","The audience is wrong"],a:2},
+    {q:"After 48 hours, what should you look at and what should you NOT decide?",o:["Look at purchases and decide whether to scale","Look at CTR, CPM, Thumb Stop Rate and video retention. Do NOT decide to kill or scale based on purchase data — insufficient at 48 hours.","Look at nothing — wait 30 days for data","Look at CTR and immediately increase budget if above 2%"],a:1},
+    {q:"What CTR benchmark indicates an exceptional creative at 48 hours?",o:["Above 0.5%","Above 1%","Above 2.5%","Above 4%"],a:3},
+    {q:"What is the 'Decoy Effect' in offer psychology?",o:["Using celebrity images to distract customers from price","Presenting three options where Option C exists to make Option B look like obvious value — e.g. Case ₹1,150 / Case+charm+popsocket ₹1,499 (recommended) / Full set ₹2,199. Most choose the middle.","Creating fake scarcity to trigger urgency","Showing competitor products to make yours look better"],a:1},
+    {q:"What is 'Hook Retention' — name two retention mechanics?",o:["Keeping customers coming back to buy — achieved through loyalty programs","The techniques that hold viewer attention after the hook: Open loops (unresolved questions), pacing & pattern interrupts, emotional escalation, visual novelty, reward prediction.","The CTR of a creative across its full lifetime","How long a creative runs before being replaced"],a:1},
+    {q:"What is the 'Status Signaling' psychological driver for Peeperly?",o:["Showing high prices to signal quality","Humans use visible possessions as signals of identity and social status. Peeperly customers aren't buying a case — they're buying a signal that says 'I curate my aesthetic and make intentional choices.'","Using celebrity endorsements to signal prestige","Offering premium packaging to signal quality"],a:1},
+    {q:"What is the Comfrt Archive principle?",o:["Archiving old creatives after 30 days to save budget","Every piece of content a creator makes is raw material — the archive is a coalmine where you find diamonds. Most won't perform but exceptional content gets repurposed as paid ads.","Compressing creative files for faster delivery","Keeping a library of competitor ads"],a:1},
+    {q:"What is creative fatigue — name 3 signs?",o:["When the creative team is overworked","When the audience has seen the same ad too many times: frequency above 3.5–4 on cold audiences, CTR declining week-over-week, CPP increasing despite stable budget","When a creative concept becomes outdated culturally","When CTR is below 1% on any ad"],a:1},
+    {q:"What are the three creative tiers in the creative scaling system?",o:["Good, Better, Best","Tier 1: Proven winners (60% of budget) / Tier 2: Testing creatives (30%) / Tier 3: Concepts in production (pipeline)","Short-form, Long-form, Static","TOFU, MOFU, BOFU creatives"],a:1},
+    {q:"What is 'Tribal Identity' as a purchase driver for Peeperly?",o:["Targeting customers based on their geographic region","Humans organise into tribes of shared values and aesthetics. Peeperly has the opportunity to build a tribe — women who believe their phone should match their life. Tribal belonging creates loyalty that pricing can't compete with.","Marketing to group buyers or wholesale customers","Creating a loyalty program with tiered membership levels"],a:1},
+    {q:"What is a Pixar-style AI ad and why does it stop the scroll?",o:["A highly polished, expensive animated brand film","An AI-generated animated ad where the viewer's brain pattern-matches it as content (not an ad) — so the critical 3-second drop-off window passes before they realise it's commercial","A cartoon mascot used in brand identity","A Meta ad format launched by Pixar and Meta together"],a:1},
+    {q:"What is the Lisa → Aisha framework shift?",o:["Lisa and Aisha are two different target markets for Peeperly","Health products use pain-driven frameworks (chronic suffering). Phone cases trigger identity tensions — the Aisha framework shifts from Pain→Villain→Solution to Identity Gap→Trigger Moment→Transformation","The Lisa framework was created for Western markets; Aisha is India-specific","Both frameworks are identical — product category doesn't matter"],a:1},
+    {q:"Name the 5 Hook Retention Mechanisms?",o:["Hook, Script, Visual, Audio, CTA","Open Loop, Pacing & Pattern Interrupts, Emotional Escalation, Visual Novelty, Reward Prediction","Awareness, Interest, Desire, Action, Retention","AIDA, BAB, PASTOR, SSS, PPPP"],a:1}
+   ]},
+  {id:4,e:'📊',t:'Performance Analysis & Scaling',s:'Chapter 4',
+   desc:"Reading campaigns like a surgeon. Metrics architecture, campaign diagnosis decision tree, three scaling strategies, cohort analysis, offer engineering, and the marketing myths every senior marketer must unlearn.",
+   topics:['The Metrics Architecture','RoAS vs MER vs Incrementality','Campaign Diagnosis Decision Tree','Three Scaling Strategies','Budget Architecture','Customer Cohort Analysis','Post-Purchase Communication System','Offer Strategy','Marketing Myths & Uncomfortable Truths','Performance FAQ: CPM, CTR, CVR, ATC'],
+   link:'https://app.notion.com/p/Ch-4-Performance-Analysis-Scaling-3666e4ff58a280b69654f189537d855b',
+   qs:[
+    {q:"What is the core mental model for reading performance numbers?",o:["Every number is an instruction — act on it immediately","Every number is a symptom — your job is to find the disease. Don't treat symptoms, trace upstream to root cause.","Numbers don't matter — only revenue matters","Check numbers daily and make one change per day"],a:1},
+    {q:"What is the critical difference between RoAS and MER?",o:["RoAS is for Meta; MER is for Google","RoAS is reported by Meta — only counts Meta-attributed revenue. MER is Total Revenue ÷ Total Marketing Spend across ALL channels. MER is the truth; RoAS is one channel's self-reported story.","RoAS includes shipping costs; MER doesn't","They are the same metric, just calculated differently"],a:1},
+    {q:"What is Incrementality and why does it matter more than RoAS?",o:["The total number of incremental orders per month","Whether a channel or campaign CAUSED purchases to happen. Retargeting may show 3x RoAS but if most buyers would have bought anyway — the true incremental value is near zero.","How quickly a campaign scales","The difference in performance between new and existing creatives"],a:1},
+    {q:"What are the three scaling strategies?",o:["Test → Validate → Scale","Vertical Scaling (increase budget on winning campaign) → Horizontal Scaling (expand to new audiences with same creative) → Creative Scaling (find more winners)","Day 1 → Week 1 → Month 1","TOFU scaling → MOFU scaling → BOFU scaling"],a:1},
+    {q:"What is the correct budget increase percentage for vertical scaling and how often?",o:["Double the budget every 24 hours when performance is good","Maximum 20–30% increase every 48–72 hours — larger increases trigger Meta's learning phase reset","10% increase per day continuously","50% increase per week when CPP is below target"],a:1},
+    {q:"What is the 'Retargeting Illusion' and why is it dangerous?",o:["Retargeting campaigns that use the wrong creative format","Retargeting claims credit for purchases that would have happened organically anyway — making CPAs look artificially strong. Teams over-invest in retargeting while wasting budget on conversions that didn't need the ad.","Showing retargeting ads to the wrong audience segment","Retargeting that runs for too long"],a:1},
+    {q:"What is the first external check to make BEFORE diagnosing a CPP spike?",o:["Check if the Meta algorithm has updated","Check inventory — is the best-selling design out of stock? This is the most commonly misdiagnosed issue at MK. A stockout can double CPP within 48 hours with zero marketing change.","Check if competitors have launched new ads","Check if the creative has been running for more than 30 days"],a:1},
+    {q:"What is CM2 and why is a negative CM2 a critical problem?",o:["Creative metric 2 — measuring second-stage creative performance","Contribution Margin 2 = CM1 minus all variable marketing spend. If CM2 is negative, you're buying orders at a loss — scaling will deepen the loss, not fix it.","Customer Multiplier 2 — the expected repeat purchase multiplier","Campaign Metric 2 — the second most important KPI"],a:1},
+    {q:"Which of these 'Marketing Myths' is TRUE?",o:["Higher RoAS always means a healthier business","A great creative fixes bad unit economics","Viral content equals profitable business","Great creative can hide bad unit economics for months — but when it fatigues, the underlying bad economics become suddenly visible"],a:3},
+    {q:"What is the Cash Conversion Cycle problem in COD-heavy D2C?",o:["The time it takes for COD refunds to process","The time between paying for inventory and receiving cash from customers (3–5 weeks for MK's COD model). Doubling ad spend requires double inventory outlay weeks before revenue arrives — scaling can create a cash crunch even on profitable unit economics.","The conversion rate of COD orders to prepaid","How long customers take to decide between COD and prepaid"],a:1},
+    {q:"What is Cohort 6 'Discount-Driven Buyer' and the correct strategy?",o:["Customers who buy twice during discount periods — give them exclusive deals","Customers who consistently purchase only during sales/with coupon codes. Strategy: use for inventory clearance ONLY. Never send them new collection launches. Track LTV separately — it's measurably lower.","High-value customers who deserve the best discounts","New customers who need a first-purchase discount"],a:1},
+    {q:"What is the 'Zero Conversion Day' and the correct response?",o:["Immediately change the creative and increase the budget","A day where an otherwise-healthy campaign shows zero conversions. Usually caused by attribution window mismatch, day-of-week effect, or Meta's exploration behaviour — NOT campaign failure. Correct response: Do nothing if 1 day in a profitable week.","Pause the campaign and contact Meta support","It means the campaign is dead — kill it and start fresh"],a:1},
+    {q:"What does the MK Growth Flywheel show and what are the two main brakes?",o:["How to increase ad spend efficiently — brakes are high CPM and low CTR","How product quality → UGC → organic reach → better CTR → lower CPM → more orders → more reviews → stronger pixel → better LALs → lower CAC — a compounding system. Main brakes: High RTO (broken delivery loop) and Discount Conditioning (prevents organic word-of-mouth).","How to structure the marketing team — brakes are lack of budget and poor hiring","How Peeperly and MC share marketing resources"],a:1},
+    {q:"What does the Post-Purchase COD pre-delivery sequence achieve?",o:["It confirms order details and asks for prepayment — recovers 5% of lost orders","Two WhatsApp messages (dispatch day + day before delivery) confirming COD amount and offering rescheduling. Reduces RTO by 5–8 percentage points. At 2,000 orders/day, 5% RTO reduction = ₹50,000/day = ₹1.5 Crore/month recovered.","It sends tracking information and reduces support contacts by 20%","It converts COD customers to prepaid — saving 15% on payment gateway fees"],a:1},
+    {q:"What are the two most important fields in the Offer Brief?",o:["Hook and Visual","Margin Check (ensures no financially destructive offer launches) and Hypothesis (creates accountability — compare result against prediction to build offer intelligence over time).","SKU and Pricing","Deliverables and Timeline"],a:1}
+   ]},
+  {id:5,e:'👑',t:'Brand Thinking & Senior Judgment',s:'Chapter 5',
+   desc:'The strategic layer. Brand identity, positioning, competitive intelligence, the 7 audience questions, the 8-figure brand blueprint, and the growth flywheel. For team leads and brand heads.',
+   topics:['Tactic vs Strategy','Brand DNA for MC & Peeperly','Competitive Positioning Matrix','The 7 Audience Questions','Retention as Profit','8-Figure Brand Blueprint','The Marketplace Strategy','The MK Growth Flywheel','Senior Operator Weekly Routine'],
+   link:'https://app.notion.com/p/Ch-5-Brand-Thinking-Sr-Judgment-3676e4ff58a280f58730e19c95bf9782',
+   qs:[
+    {q:"What is the difference between a tactic and a strategy?",o:["Tactics are expensive; strategies are free","A tactic answers 'what are we doing today?' A strategy answers 'why are we doing this and does it move us toward a goal that matters?' Teams that operate only at tactical level are always busy and always behind.","Tactics are for junior staff; strategies are for seniors","Tactics are short-term ads; strategies are long-term brand campaigns"],a:1},
+    {q:"What is a 'brand' — the real definition?",o:["A logo, color palette, and font system","A set of associations that live in your customer's mind — everything she believes, feels, and expects when she encounters your name, before she sees a single product or reads a word of copy","The company's mission and vision statements","The advertising campaigns and marketing materials a company produces"],a:1},
+    {q:"What is Peeperly's most defensible positioning territory?",o:["The cheapest premium option competing with Amazon","Same positioning as BURGA — global premium lifestyle","The premium, design-led, women-specific phone case brand in India — a space no Indian brand currently owns at scale.","The best-value phone case for all demographics"],a:2},
+    {q:"What are Steve Jobs' most important marketing principles referenced in Chapter 5?",o:["Always advertise on TV and hire the best agencies","We have to be really clear on what we want them to know about us — communicate values (who it's for, what it stands for), NOT speeds, feeds, specs, or why we're better than competitors.","Focus on product features and technical superiority","Spend 10x more on marketing than any competitor"],a:1},
+    {q:"What is the 8-Figure Brand Blueprint step most brands skip?",o:["Step 1: Find a product that sells well online","Step 5: Build LTV BEFORE scaling hard. Most brands find a winning ad, crank spend, ride the RoAS wave — then Meta fluctuates and there's no backend. Brands that can outbid everyone have the highest LTV.","Step 3: Hire a large marketing team immediately","Step 6: Go viral on Instagram before spending on paid ads"],a:1},
+    {q:"What does 'Creative is the New Targeting' mean for MK's Meta strategy?",o:["Creative matters more than budget","Meta's algorithm reads the creative itself as the primary targeting signal. Strong creative finds its own audience. The media buyer's job shifts from audience architect to creative systems operator.","Creating ads that look like organic content to avoid being detected","Using AI tools to create more creatives faster at lower cost"],a:1},
+    {q:"What are the two brakes on the MK Growth Flywheel and the correct fix for each?",o:["High CPM (fix: reduce budget) and Low CTR (fix: change creative)","High RTO (brake on UGC loop — fix: GoKwik RTO controls + pre-delivery WhatsApp) and Discount Conditioning (brake on word-of-mouth — fix: limit discount campaigns to 4/year for MC, 2/year for Peeperly)","Poor design (fix: hire better designers) and Slow delivery (fix: change logistics)","Low Instagram followers (fix: influencer seeding) and Weak email list (fix: pop-up forms)"],a:1},
+    {q:"What is the LTV:CAC ratio that defines a 'real, sustainably growing business'?",o:["1:1 — you spend what you earn","2:1 — you earn twice what you spend","3:1 or above — this is the threshold where compounding growth becomes possible","5:1 — the higher the better with no upper limit"],a:2},
+    {q:"Answer all 4 brand clarity questions for Peeperly:",o:["Build for revenue; known for cases; must run ads; must learn Shopify","Build to be India's #1 premium women's phone case brand; known for treating the phone as an intentional identity accessory; must execute editorial Instagram + micro-influencer army + premium unboxing; must build cohort LTV data and email/WhatsApp retention infrastructure","Build to compete with Casetify; known for Indian designs; must expand to Amazon; must learn SEO","Build for Tier 1 cities only; known for affordable premium; must hire influencers; must learn TikTok"],a:1},
+    {q:"What is the Marketplace Strategy for Peeperly vs MC?",o:["Both brands should be listed on all marketplaces at the same price as D2C","MC: Marketplaces are a volume and discovery channel. Peeperly: selective presence on PREMIUM marketplaces (Myntra, Nykaa Fashion) where editorial context supports premium pricing. Non-negotiable for both: D2C price at parity with or lower than marketplace.","Neither brand should be on marketplaces — it hurts D2C brand building","Both brands should lead with marketplace before D2C to build volume first"],a:1},
+    {q:"What does the senior marketer's Monday routine look like?",o:["Post on LinkedIn, check Instagram analytics, review team performance","9AM: Full performance dashboard. 9:30AM: Scale decisions. 10AM: Creative pipeline review. 10:30AM: Inventory alignment. 11AM: Flag issues to relevant teams. Wednesday mid-week check. Friday creative brief day.","Weekly team meeting, budget review, then plan next week's ads","Check CPP once, adjust budgets if needed, brief new creatives"],a:1},
+    {q:"What is the Congruence Principle and how does it affect conversion rate?",o:["All team members must agree on brand direction before any campaign launches","Ad-to-page message match. If the ad makes a specific promise and the landing page doesn't continue that exact conversation — trust drops immediately. Matching page type to audience temperature can move CVR from 0.8% to 7%.","All brand communications must use the same logo and color palette","The brand's Instagram aesthetic must match its Meta ad aesthetic exactly"],a:1},
+    {q:"Complete this from the eCom Library: 'You don't need a new idea. You need to...'",o:["...spend more money on proven channels","...identify what's already proven and build a genuinely superior version of it. GENUINELY — clearly, undeniably superior.","...hire a better creative team than your competitors","...copy what's working in Western markets and adapt for India"],a:1},
+    {q:"What is the 7 Audience Questions framework — answer Q7 for Peeperly?",o:["7 demographic questions about age, city, income","A framework for deep customer knowledge. Q7 for Peeperly: What problems does Peeperly solve? The gap between ₹99 Amazon generic cases (bad quality, boring design) and ₹3,500+ Casetify (too expensive). Peeperly owns the 'genuinely good design at accessible premium price' space.","7 questions about purchasing behaviour and cart size","Questions asked in customer surveys to improve product quality"],a:1},
+    {q:"What is the single most important strategic priority for MK in the next 12 months?",o:["Hire 50 more people to the marketing team","Build the systems and data infrastructure: LTV tracking, cohort analysis, post-purchase communication flows, RTO reduction, and brand equity investment for Peeperly — without these, additional ad spend just exposes the weakness of the flywheel's other components faster.","Double the Meta ad spend across both brands immediately","Launch both brands internationally in UAE and US markets"],a:1}
+   ]}
 ];
 
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let currentUser = null;
-let currentView = 'dashboard';
-let currentChapter = null;
-let testState = null;
-let adminTab = 'users';
+// ─── FIREBASE HELPERS ────────────────────────────────────────
+function sk(email){ return email.replace(/\./g,'_'); }
 
-// ═══════════════════════════════════════════
-// STORAGE — localStorage for GitHub Pages
-// ═══════════════════════════════════════════
-const STORAGE_PREFIX = 'mk_academy_';
-
-function lsGet(key) {
-  try { const v = localStorage.getItem(STORAGE_PREFIX + key); return v ? JSON.parse(v) : null; } catch { return null; }
+async function fbGet(path){
+  const snap = await db.ref(path).once('value');
+  return snap.exists() ? snap.val() : null;
 }
-function lsSet(key, value) {
-  try { localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value)); } catch(e) { console.error('Storage error:', e); }
+async function fbSet(path, value){
+  await db.ref(path).set(value);
 }
 
-// ═══════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════
-function showMsg(msg, type) {
+// ─── STATE ───────────────────────────────────────────────────
+let CU = null; // current user
+let CV = 'dash'; // current view
+let CC = null; // current chapter
+let TS = null; // test state
+let AT = 'users'; // admin tab
+
+// ─── AUTH HELPERS ────────────────────────────────────────────
+function showMsg(msg, type){
   const el = document.getElementById('auth-msg');
   el.className = 'auth-msg ' + type;
   el.textContent = msg;
   el.style.display = 'block';
 }
-
-function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
+function switchTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='signup')));
   document.getElementById('login-form').style.display = tab==='login'?'block':'none';
   document.getElementById('signup-form').style.display = tab==='signup'?'block':'none';
   document.getElementById('auth-msg').style.display = 'none';
 }
 
-function initAdmin() {
-  if (!lsGet('admin')) {
-    lsSet('admin', { name:'Krishan Kumar (KK)', email:'admin@millionskart.com', password:'mkadmin2026' });
+// ─── INIT ADMIN ──────────────────────────────────────────────
+async function initAdmin(){
+  const existing = await fbGet('mk_academy/admin');
+  if(!existing){
+    await fbSet('mk_academy/admin',{name:'Krishan Kumar (KK)',email:'admin@millionskart.com',password:'mkadmin2026'});
   }
 }
 
-function handleLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass = document.getElementById('login-password').value;
-  if (!email || !pass) { showMsg('Please fill in all fields.', 'error'); return; }
+// ─── LOGIN ───────────────────────────────────────────────────
+async function doLogin(){
+  const email = document.getElementById('le').value.trim().toLowerCase();
+  const pass = document.getElementById('lp').value;
+  if(!email||!pass){showMsg('Please fill in all fields.','error');return;}
+  showMsg('Signing in...','success');
+  try{
+    const admin = await fbGet('mk_academy/admin');
+    if(admin && admin.email===email && admin.password===pass){
+      CU={name:admin.name,email,role:'admin'};
+      launchApp();return;
+    }
+    const user = await fbGet('mk_academy/users/'+sk(email));
+    if(!user){showMsg('No account found with this email.','error');return;}
+    if(user.password!==pass){showMsg('Incorrect password.','error');return;}
+    if(!user.approved){showMsg('Your account is pending admin approval. Please contact your team lead.','error');return;}
+    CU={name:user.name,email,role:'learner'};
+    launchApp();
+  }catch(e){showMsg('Connection error. Please try again.','error');console.error(e);}
+}
 
-  const admin = lsGet('admin');
-  if (admin && admin.email === email && admin.password === pass) {
-    currentUser = { name: admin.name, email, role: 'admin' };
-    launchApp(); return;
+// ─── SIGNUP ──────────────────────────────────────────────────
+async function doSignup(){
+  const name = document.getElementById('sn').value.trim();
+  const email = document.getElementById('se').value.trim().toLowerCase();
+  const pass = document.getElementById('sp').value;
+  if(!name||!email||!pass){showMsg('Please fill in all fields.','error');return;}
+  if(pass.length<6){showMsg('Password must be at least 6 characters.','error');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showMsg('Please enter a valid email address.','error');return;}
+  showMsg('Creating account...','success');
+  try{
+    const existing = await fbGet('mk_academy/users/'+sk(email));
+    if(existing){showMsg('An account with this email already exists.','error');return;}
+    await fbSet('mk_academy/users/'+sk(email),{name,email,password:pass,approved:false,createdAt:Date.now(),progress:{},scores:{},previousWrong:{},attemptCount:{}});
+    document.getElementById('sn').value='';
+    document.getElementById('se').value='';
+    document.getElementById('sp').value='';
+    switchTab('login');
+    showMsg('Account created! Please wait for admin approval before signing in.','success');
+  }catch(e){showMsg('Connection error. Please try again.','error');console.error(e);}
+}
+
+// ─── LOGOUT ──────────────────────────────────────────────────
+function doLogout(){
+  CU=null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  switchTab('login');
+  document.getElementById('le').value='';
+  document.getElementById('lp').value='';
+}
+
+// ─── LAUNCH ──────────────────────────────────────────────────
+function launchApp(){
+  document.getElementById('auth-screen').style.display='none';
+  const app=document.getElementById('app');
+  app.style.display='flex';app.style.flexDirection='column';
+  document.getElementById('un').textContent=CU.name;
+  document.getElementById('ur').textContent=CU.role==='admin'?'Admin':'Learner';
+  document.getElementById('ua').textContent=CU.name.charAt(0).toUpperCase();
+  if(CU.role==='admin'){document.getElementById('nav-admin').style.display='flex';document.getElementById('sb-bottom').style.display='none';}
+  else{document.getElementById('nav-admin').style.display='none';document.getElementById('sb-bottom').style.display='block';}
+  renderSB();showDash();
+}
+
+// ─── USER DATA ───────────────────────────────────────────────
+async function getUD(){
+  if(CU.role==='admin')return{progress:{},scores:{}};
+  return await fbGet('mk_academy/users/'+sk(CU.email))||{progress:{},scores:{}};
+}
+async function getUP(){const d=await getUD();return d.progress||{};}
+async function isPassed(id){if(CU.role==='admin')return true;const p=await getUP();return p[id]==='passed';}
+async function isUnlocked(id){if(CU.role==='admin')return true;if(id===1)return true;return await isPassed(id-1);}
+async function passedCount(){const p=await getUP();return Object.values(p).filter(v=>v==='passed').length;}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────
+async function renderSB(){
+  const c=document.getElementById('sb-chapters');
+  const pc=await passedCount();
+  document.getElementById('prog-txt').textContent=pc+' / 5';
+  document.getElementById('prog-fill').style.width=((pc/5)*100)+'%';
+  let h='';
+  for(const ch of CHS){
+    const u=await isUnlocked(ch.id);
+    const p=await isPassed(ch.id);
+    const act=CC&&CC.id===ch.id;
+    let ic=u?(p?'d':'u'):'l';if(act&&u)ic='a';
+    const st=!u?'Locked':p?'✓ Passed':'Not started';
+    const sc=!u?'locked':p?'passed':'';
+    const ri=!u?'<span style="font-size:12px;color:var(--locked)">🔒</span>':p?'<span style="font-size:13px;color:var(--success)">✓</span>':'';
+    h+=`<div class="ch-item ${!u?'locked-item':''} ${act?'active':''}" onclick="${u?`selCh(${ch.id})`:''}">
+      <div class="ch-icon ${ic}">${ch.e}</div>
+      <div class="ch-meta"><div class="ch-name">${ch.t}</div><div class="ch-status ${sc}">${st}</div></div>
+      ${ri}</div>`;
   }
-
-  const user = lsGet('user_' + email);
-  if (!user) { showMsg('No account found with this email.', 'error'); return; }
-  if (user.password !== pass) { showMsg('Incorrect password.', 'error'); return; }
-  if (!user.approved) { showMsg('Your account is pending admin approval. Please contact your team lead.', 'error'); return; }
-  currentUser = { name: user.name, email, role: 'learner' };
-  launchApp();
+  c.innerHTML=h;
 }
 
-function handleSignup() {
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim().toLowerCase();
-  const pass = document.getElementById('signup-password').value;
-  if (!name || !email || !pass) { showMsg('Please fill in all fields.', 'error'); return; }
-  if (pass.length < 6) { showMsg('Password must be at least 6 characters.', 'error'); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('Please enter a valid email address.', 'error'); return; }
-  if (lsGet('user_' + email)) { showMsg('An account with this email already exists.', 'error'); return; }
-
-  lsSet('user_' + email, { name, email, password: pass, approved: false, createdAt: Date.now(), progress: {}, scores: {}, previousWrong: {}, attemptCount: {} });
-
-  const idx = lsGet('users_index') || [];
-  if (!idx.includes(email)) { idx.push(email); lsSet('users_index', idx); }
-
-  document.getElementById('signup-name').value = '';
-  document.getElementById('signup-email').value = '';
-  document.getElementById('signup-password').value = '';
-  switchAuthTab('login');
-  showMsg('Account created! Please wait for admin approval before signing in.', 'success');
+// ─── NAV ─────────────────────────────────────────────────────
+function setTS(n){document.getElementById('ts').textContent=n;}
+function setNA(id){
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
 }
-
-function handleLogout() {
-  currentUser = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('auth-screen').style.display = 'flex';
-  switchAuthTab('login');
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
+async function selCh(id){
+  const ch=CHS.find(c=>c.id===id);
+  if(!ch||!(await isUnlocked(id)))return;
+  CC=ch;CV='chapter';renderSB();setNA('');renderChView(ch);
 }
+function showDash(){CV='dash';CC=null;setTS('Dashboard');setNA('nav-dash');renderSB();renderDash();}
+function showAdmin(){CV='admin';setTS('Admin Panel');setNA('nav-admin');renderAdmin();}
 
-// ═══════════════════════════════════════════
-// APP LAUNCH
-// ═══════════════════════════════════════════
-function launchApp() {
-  document.getElementById('auth-screen').style.display = 'none';
-  const app = document.getElementById('app');
-  app.style.display = 'flex';
-  app.style.flexDirection = 'column';
-
-  document.getElementById('topbar-name').textContent = currentUser.name;
-  document.getElementById('topbar-role').textContent = currentUser.role === 'admin' ? 'Admin' : 'Learner';
-  document.getElementById('topbar-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
-
-  if (currentUser.role === 'admin') {
-    document.getElementById('nav-admin').style.display = 'flex';
-    document.getElementById('sidebar-bottom').style.display = 'none';
-  } else {
-    document.getElementById('nav-admin').style.display = 'none';
-    document.getElementById('sidebar-bottom').style.display = 'block';
-  }
-
-  renderSidebar();
-  showDashboard();
-}
-
-// ═══════════════════════════════════════════
-// USER DATA
-// ═══════════════════════════════════════════
-function getUserData() {
-  if (currentUser.role === 'admin') return { progress: {}, scores: {} };
-  return lsGet('user_' + currentUser.email) || { progress: {}, scores: {} };
-}
-
-function getUserProgress() { return getUserData().progress || {}; }
-
-function isChapterPassed(chId) {
-  if (currentUser.role === 'admin') return true;
-  return getUserProgress()[chId] === 'passed';
-}
-
-function isChapterUnlocked(chId) {
-  if (currentUser.role === 'admin') return true;
-  if (chId === 1) return true;
-  return isChapterPassed(chId - 1);
-}
-
-function getPassedCount() {
-  return Object.values(getUserProgress()).filter(v => v === 'passed').length;
-}
-
-// ═══════════════════════════════════════════
-// SIDEBAR
-// ═══════════════════════════════════════════
-function renderSidebar() {
-  const container = document.getElementById('sidebar-chapters');
-  const passedCount = getPassedCount();
-
-  document.getElementById('progress-text').textContent = passedCount + ' / 5';
-  document.getElementById('progress-fill').style.width = ((passedCount / 5) * 100) + '%';
-
-  let html = '';
-  for (const ch of CHAPTERS) {
-    const unlocked = isChapterUnlocked(ch.id);
-    const passed = isChapterPassed(ch.id);
-    const isActive = currentChapter && currentChapter.id === ch.id;
-    let iconClass = unlocked ? (passed ? 'completed' : 'unlocked') : 'locked';
-    if (isActive && unlocked) iconClass = 'active-icon';
-    const statusText = !unlocked ? 'Locked' : passed ? '✓ Passed' : 'Not started';
-    const statusClass = !unlocked ? 'locked-st' : passed ? 'passed' : '';
-    const rightIcon = !unlocked ? '<span style="font-size:12px;color:var(--locked)">🔒</span>' : passed ? '<span style="font-size:13px;color:var(--success)">✓</span>' : '';
-    html += `<div class="chapter-item ${!unlocked?'locked-item':''} ${isActive?'active':''}" onclick="${unlocked?`selectChapter(${ch.id})`:''}">
-      <div class="chapter-icon ${iconClass}">${ch.emoji}</div>
-      <div class="chapter-meta">
-        <div class="chapter-name">${ch.title}</div>
-        <div class="chapter-status ${statusClass}">${statusText}</div>
-      </div>
-      ${rightIcon}
-    </div>`;
-  }
-  container.innerHTML = html;
-}
-
-// ═══════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════
-function setTopbarSection(name) { document.getElementById('topbar-section').textContent = name; }
-
-function setNavActive(id) {
-  document.querySelectorAll('.sidebar-nav-item').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-}
-
-function selectChapter(id) {
-  const ch = CHAPTERS.find(c => c.id === id);
-  if (!ch || !isChapterUnlocked(id)) return;
-  currentChapter = ch;
-  currentView = 'chapter';
-  renderSidebar();
-  setNavActive('');
-  renderChapterView(ch);
-}
-
-function showDashboard() {
-  currentView = 'dashboard';
-  currentChapter = null;
-  setTopbarSection('Dashboard');
-  setNavActive('nav-dashboard');
-  renderSidebar();
-  renderDashboard();
-}
-
-function showAdmin() {
-  currentView = 'admin';
-  setTopbarSection('Admin Panel');
-  setNavActive('nav-admin');
-  renderAdminPanel();
-}
-
-// ═══════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════
-function renderDashboard() {
-  const inner = document.getElementById('content-inner');
-  const passedCount = getPassedCount();
-
-  if (currentUser.role === 'admin') {
-    const idx = lsGet('users_index') || [];
-    inner.innerHTML = `
-      <div class="page-eyebrow">Admin Overview</div>
-      <div class="page-title">Welcome back, ${currentUser.name.split(' ')[0]} 👋</div>
-      <div class="page-subtitle">MK Marketing Academy — manage team access, track progress, and keep the guide updated.</div>
+// ─── DASHBOARD ───────────────────────────────────────────────
+async function renderDash(){
+  const ci=document.getElementById('ci');
+  ci.innerHTML='<div class="loading">Loading...</div>';
+  const pc=await passedCount();
+  if(CU.role==='admin'){
+    const users=await fbGet('mk_academy/users')||{};
+    const count=Object.keys(users).length;
+    ci.innerHTML=`
+      <div class="eyebrow">Admin Overview</div>
+      <div class="page-title">Welcome back, ${CU.name.split(' ')[0]} 👋</div>
+      <div class="page-sub">MK Marketing Academy — manage team access, track progress, and keep the guide updated.</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
-        <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--accent)">${idx.length}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Team members registered</div></div>
+        <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--accent)">${count}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Team members registered</div></div>
         <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--success)">5</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Chapters available</div></div>
         <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--warning)">70%</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Pass mark required</div></div>
       </div>
       <div class="divider"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn btn-primary btn-sm" onclick="showAdmin()">Manage team →</button>
-        <button class="btn btn-secondary btn-sm" onclick="selectChapter(1)">Preview Chapter 1</button>
+        <button class="btn btn-secondary btn-sm" onclick="selCh(1)">Preview Chapter 1</button>
       </div>
       <div class="divider"></div>
       <div style="background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius);padding:16px 20px;font-size:13px;color:var(--text)">
-        <strong>Admin login:</strong> admin@millionskart.com &nbsp;/&nbsp; mkadmin2026 &mdash; Change password in browser localStorage key <code>mk_academy_admin</code> if needed.
+        <strong>✅ Firebase connected.</strong> All user data syncs in real time across every device. Admin login: admin@millionskart.com / mkadmin2026
       </div>`;
     return;
   }
-
-  const progress = getUserProgress();
-  const nextCh = CHAPTERS.find(ch => progress[ch.id] !== 'passed');
-
-  inner.innerHTML = `
-    <div class="page-eyebrow">Marketing Academy</div>
-    <div class="page-title">Welcome back, ${currentUser.name.split(' ')[0]} 👋</div>
-    <div class="page-subtitle">You've completed ${passedCount} of 5 chapters. ${passedCount === 5 ? 'Outstanding — you\'ve mastered the full guide! 🎉' : 'Keep going — each chapter you pass unlocks the next.'}</div>
+  const progress=await getUP();
+  const nextCh=CHS.find(ch=>progress[ch.id]!=='passed');
+  ci.innerHTML=`
+    <div class="eyebrow">Marketing Academy</div>
+    <div class="page-title">Welcome back, ${CU.name.split(' ')[0]} 👋</div>
+    <div class="page-sub">You've completed ${pc} of 5 chapters. ${pc===5?'Outstanding — you\'ve mastered the full guide! 🎉':'Keep going — each chapter you pass unlocks the next.'}</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
-      <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--accent)">${passedCount}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Chapters passed</div></div>
-      <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--text)">${5-passedCount}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Chapters remaining</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--accent)">${pc}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Chapters passed</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--text)">${5-pc}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Chapters remaining</div></div>
       <div class="card" style="text-align:center"><div style="font-size:32px;font-weight:800;color:var(--warning)">70%</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Pass mark required</div></div>
     </div>
-    ${nextCh ? `<div style="background:var(--accent-light);border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:24px;cursor:pointer" onclick="selectChapter(${nextCh.id})">
-      <div style="font-size:28px">${nextCh.emoji}</div>
-      <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Continue where you left off</div><div style="font-size:16px;font-weight:600">${nextCh.title}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:3px">${nextCh.subtitle}</div></div>
+    ${nextCh?`<div style="background:var(--accent-light);border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:24px;cursor:pointer" onclick="selCh(${nextCh.id})">
+      <div style="font-size:28px">${nextCh.e}</div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Continue where you left off</div><div style="font-size:16px;font-weight:600">${nextCh.t}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:3px">${nextCh.s}</div></div>
       <div style="font-size:20px;color:var(--accent)">→</div>
-    </div>` : ''}
+    </div>`:''}
     <div class="divider"></div>
     <h3 style="font-size:15px;font-weight:600;margin-bottom:16px">All chapters</h3>
-    ${CHAPTERS.map(ch => {
-      const passed = progress[ch.id] === 'passed';
-      const unlocked = isChapterUnlocked(ch.id);
-      return `<div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;cursor:${unlocked?'pointer':'not-allowed'};opacity:${unlocked?1:0.5}" ${unlocked?`onclick="selectChapter(${ch.id})"`:''}>
-        <div style="width:36px;height:36px;border-radius:8px;background:${passed?'var(--success-light)':unlocked?'var(--accent-light)':'var(--bg-hover)'};display:flex;align-items:center;justify-content:center;font-size:16px">${ch.emoji}</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:500">${ch.title}</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px">${ch.subtitle} &middot; ${ch.questions.length} questions</div></div>
+    ${CHS.map(ch=>{
+      const passed=progress[ch.id]==='passed';
+      const unlocked=ch.id===1||progress[ch.id-1]==='passed';
+      return `<div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;cursor:${unlocked?'pointer':'not-allowed'};opacity:${unlocked?1:0.5}" ${unlocked?`onclick="selCh(${ch.id})"`:''}>
+        <div style="width:36px;height:36px;border-radius:8px;background:${passed?'var(--success-light)':unlocked?'var(--accent-light)':'var(--bg-hover)'};display:flex;align-items:center;justify-content:center;font-size:16px">${ch.e}</div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:500">${ch.t}</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px">${ch.s} &middot; ${ch.qs.length} questions</div></div>
         <span class="badge ${passed?'badge-green':unlocked?'badge-blue':'badge-gray'}">${passed?'✓ Passed':unlocked?'Unlocked':'🔒 Locked'}</span>
       </div>`;
     }).join('')}`;
 }
 
-// ═══════════════════════════════════════════
-// CHAPTER VIEW
-// ═══════════════════════════════════════════
-function renderChapterView(ch) {
-  setTopbarSection(ch.subtitle + ' — ' + ch.title);
-  const passed = isChapterPassed(ch.id);
-  const userData = getUserData();
-  const bestScore = userData.scores && userData.scores[ch.id] ? userData.scores[ch.id] : null;
-  const inner = document.getElementById('content-inner');
-
-  inner.innerHTML = `
+// ─── CHAPTER VIEW ────────────────────────────────────────────
+async function renderChView(ch){
+  setTS(ch.s+' — '+ch.t);
+  const passed=await isPassed(ch.id);
+  const ud=await getUD();
+  const best=ud.scores&&ud.scores[ch.id]?ud.scores[ch.id]:null;
+  const ci=document.getElementById('ci');
+  ci.innerHTML=`
     <div style="margin-bottom:32px">
-      <div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">${ch.subtitle}</div>
-      <div style="font-size:26px;font-weight:700;margin-bottom:10px">${ch.emoji} ${ch.title}</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">${ch.s}</div>
+      <div style="font-size:26px;font-weight:700;margin-bottom:10px">${ch.e} ${ch.t}</div>
       <div style="font-size:15px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px">${ch.desc}</div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span class="badge badge-blue">📖 ${ch.topics.length} topics</span>
-        <span class="badge badge-gray">📝 ${ch.questions.length} test questions</span>
-        ${passed ? '<span class="badge badge-green">✓ Passed</span>' : ''}
-        ${bestScore !== null ? `<span class="badge ${bestScore>=70?'badge-green':'badge-orange'}">Best score: ${bestScore}%</span>` : ''}
+        <span class="badge badge-gray">📝 ${ch.qs.length} test questions</span>
+        ${passed?'<span class="badge badge-green">✓ Passed</span>':''}
+        ${best!==null?`<span class="badge ${best>=70?'badge-green':'badge-orange'}">Best score: ${best}%</span>`:''}
       </div>
     </div>
     <div class="divider"></div>
     <div style="margin-bottom:28px">
       <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">📚 What you'll learn</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${ch.topics.map(t => `<div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-secondary);padding:5px 0"><span style="color:var(--accent);font-size:10px;margin-top:5px">●</span>${t}</div>`).join('')}
+        ${ch.topics.map(t=>`<div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-secondary);padding:5px 0"><span style="color:var(--accent);font-size:10px;margin-top:5px">●</span>${t}</div>`).join('')}
       </div>
     </div>
     <div class="divider"></div>
     <div style="margin-bottom:28px">
       <h3 style="font-size:16px;font-weight:600;margin-bottom:8px">🔗 Read the full chapter in Notion</h3>
       <p style="font-size:14px;color:var(--text-secondary);margin-bottom:14px;line-height:1.7">Read the complete chapter in the MK Ads & Marketing Guide on Notion before taking the test. The test is based entirely on the chapter content.</p>
-      <div class="notion-link-card" onclick="window.open('${ch.notionLink}','_blank')">
+      <div class="notion-card" onclick="window.open('${ch.link}','_blank')">
         <div style="font-size:20px">📄</div>
-        <div style="flex:1">
-          <div class="notion-link-title">${ch.title} — Full Chapter</div>
-          <div class="notion-link-sub">Opens in Notion · Read time: 30–45 mins</div>
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();window.open('${ch.notionLink}','_blank')">Open →</button>
+        <div style="flex:1"><div style="font-size:14px;font-weight:500">${ch.t} — Full Chapter</div><div style="font-size:12px;color:var(--text-tertiary);margin-top:2px">Opens in Notion · Read time: 30–45 mins</div></div>
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();window.open('${ch.link}','_blank')">Open →</button>
       </div>
     </div>
     <div class="divider"></div>
-    ${passed ? `
-    <div class="already-passed">
+    ${passed?`
+    <div class="passed-banner">
       <div style="font-size:28px">🎉</div>
       <div>
         <div style="font-size:16px;font-weight:600;color:var(--success)">Chapter passed!</div>
-        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">You've already passed this chapter with a best score of ${bestScore}%. ${ch.id < 5 ? 'Chapter '+(ch.id+1)+' is now unlocked.' : 'You\'ve completed the full guide!'}</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Best score: ${best}%. ${ch.id<5?'Chapter '+(ch.id+1)+' is now unlocked.':'You\'ve completed the full guide!'}</div>
         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-secondary btn-sm" onclick="startTest(${ch.id})">Retake test</button>
-          ${ch.id < 5 ? `<button class="btn btn-primary btn-sm" onclick="selectChapter(${ch.id+1})">Next chapter →</button>` : ''}
+          ${ch.id<5?`<button class="btn btn-primary btn-sm" onclick="selCh(${ch.id+1})">Next chapter →</button>`:''}
         </div>
       </div>
-    </div>` : `
-    <div class="start-test-cta">
+    </div>`:`
+    <div class="test-cta">
       <div style="font-size:36px">📝</div>
       <div style="flex:1">
         <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">Ready to take the test?</h3>
-        <p style="font-size:13px;color:var(--text-secondary)">Answer ${ch.questions.length} questions. Score 70%+ to pass and unlock the next chapter.</p>
+        <p style="font-size:13px;color:var(--text-secondary)">Answer ${ch.qs.length} questions. Score 70%+ to pass and unlock the next chapter.</p>
       </div>
       <button class="btn btn-primary btn-sm" onclick="startTest(${ch.id})">Start test →</button>
     </div>`}`;
 }
 
-// ═══════════════════════════════════════════
-// TEST ENGINE
-// ═══════════════════════════════════════════
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length-1; i > 0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
-}
+// ─── TEST ENGINE ─────────────────────────────────────────────
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-function startTest(chapterId) {
-  const ch = CHAPTERS.find(c => c.id === chapterId);
-  currentChapter = ch;
-  currentView = 'test';
-
-  const userData = getUserData();
-  const previousWrongIdxs = userData.previousWrong && userData.previousWrong[chapterId] ? userData.previousWrong[chapterId] : [];
-  const attemptCount = userData.attemptCount && userData.attemptCount[chapterId] ? userData.attemptCount[chapterId] : 0;
-
+async function startTest(chId){
+  const ch=CHS.find(c=>c.id===chId);
+  CC=ch;CV='test';
+  const ud=await getUD();
+  const prevWrong=ud.previousWrong&&ud.previousWrong[chId]?ud.previousWrong[chId]:[];
+  const attempts=ud.attemptCount&&ud.attemptCount[chId]?ud.attemptCount[chId]:0;
+  const total=Math.min(15,ch.qs.length);
   let questions;
-  const total = Math.min(15, ch.questions.length);
-
-  if (attemptCount === 0 || previousWrongIdxs.length === 0) {
-    questions = shuffleArray([...ch.questions]).slice(0, total);
-  } else {
-    const wrongQs = ch.questions.filter((_, i) => previousWrongIdxs.includes(i));
-    const rightQs = ch.questions.filter((_, i) => !previousWrongIdxs.includes(i));
-    const halfWrong = shuffleArray(wrongQs).slice(0, Math.ceil(total/2));
-    const halfNew = shuffleArray(rightQs).slice(0, Math.floor(total/2));
-    questions = shuffleArray([...halfWrong, ...halfNew]).slice(0, total);
+  if(attempts===0||prevWrong.length===0){
+    questions=shuffle([...ch.qs]).slice(0,total);
+  }else{
+    const wrongQs=ch.qs.filter((_,i)=>prevWrong.includes(i));
+    const rightQs=ch.qs.filter((_,i)=>!prevWrong.includes(i));
+    const hw=shuffle(wrongQs).slice(0,Math.ceil(total/2));
+    const hn=shuffle(rightQs).slice(0,Math.floor(total/2));
+    questions=shuffle([...hw,...hn]).slice(0,total);
   }
-
-  testState = { chapterId, questions, current: 0, answers: new Array(questions.length).fill(null) };
-  renderTestQuestion();
-  renderSidebar();
+  TS={chId,questions,cur:0,answers:new Array(questions.length).fill(null)};
+  renderQ();renderSB();
 }
 
-function renderTestQuestion() {
-  const { questions, current, answers } = testState;
-  const q = questions[current];
-  const total = questions.length;
-  const ch = CHAPTERS.find(c => c.id === testState.chapterId);
-  setTopbarSection('Test — ' + ch.title);
-
-  const inner = document.getElementById('content-inner');
-  const letters = ['A','B','C','D'];
-  const allAnswered = answers.every(a => a !== null);
-  const answeredCount = answers.filter(a => a !== null).length;
-
-  inner.innerHTML = `
+function renderQ(){
+  const{questions,cur,answers}=TS;
+  const q=questions[cur];
+  const ch=CHS.find(c=>c.id===TS.chId);
+  const total=questions.length;
+  setTS('Test — '+ch.t);
+  const ci=document.getElementById('ci');
+  const L=['A','B','C','D'];
+  const allAns=answers.every(a=>a!==null);
+  const ansCount=answers.filter(a=>a!==null).length;
+  ci.innerHTML=`
     <div style="margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:500">📝 ${ch.emoji} ${ch.title} — Test</div>
-        <div style="font-size:13px;color:var(--text-secondary)">${answeredCount}/${total} answered</div>
+        <div style="font-size:13px;font-weight:500">📝 ${ch.e} ${ch.t} — Test</div>
+        <div style="font-size:13px;color:var(--text-secondary)">${ansCount}/${total} answered</div>
       </div>
-      <div class="test-progress-bar"><div class="test-progress-fill" style="width:${((current+1)/total)*100}%"></div></div>
+      <div class="t-prog"><div class="t-prog-fill" style="width:${((cur+1)/total)*100}%"></div></div>
     </div>
-    <div class="question-num">Question ${current+1} of ${total}</div>
-    <div class="question-text">${q.q}</div>
-    <div class="options-list">
-      ${q.opts.map((opt, i) => `<div class="option-item ${answers[current]===i?'selected':''}" onclick="selectAnswer(${i})">
-        <div class="option-letter">${letters[i]}</div>
-        <div>${opt}</div>
+    <div class="q-num">Question ${cur+1} of ${total}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="opts">
+      ${q.o.map((opt,i)=>`<div class="opt ${answers[cur]===i?'sel':''}" onclick="selAns(${i})">
+        <div class="opt-ltr">${L[i]}</div><div>${opt}</div>
       </div>`).join('')}
     </div>
     <div class="test-nav">
-      <button class="btn btn-secondary btn-sm" onclick="testNav(-1)" ${current===0?'disabled':''}>← Back</button>
+      <button class="btn btn-secondary btn-sm" onclick="tNav(-1)" ${cur===0?'disabled':''}>← Back</button>
       <div style="display:flex;gap:8px;align-items:center">
-        ${current < total-1
-          ? `<button class="btn btn-primary btn-sm" onclick="testNav(1)" ${answers[current]===null?'disabled':''}>Next →</button>`
-          : `<button class="btn btn-success btn-sm" onclick="submitTest()" ${!allAnswered?'disabled':''}>Submit ${allAnswered?'✓':answeredCount+'/'+total}</button>`
+        ${cur<total-1
+          ?`<button class="btn btn-primary btn-sm" onclick="tNav(1)" ${answers[cur]===null?'disabled':''}>Next →</button>`
+          :`<button class="btn btn-success btn-sm" onclick="submitTest()" ${!allAns?'disabled':''}>Submit ${allAns?'✓':ansCount+'/'+total}</button>`
         }
       </div>
     </div>
     <div style="margin-top:20px;display:flex;gap:4px;flex-wrap:wrap">
-      ${answers.map((a,i) => `<div style="width:28px;height:28px;border-radius:4px;border:1.5px solid ${i===current?'var(--accent)':a!==null?'var(--success)':'var(--border)'};background:${i===current?'var(--accent-light)':a!==null?'var(--success-light)':'var(--bg)'};display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;font-weight:600;color:${i===current?'var(--accent)':a!==null?'var(--success)':'var(--text-tertiary)'}" onclick="testState.current=${i};renderTestQuestion()">${i+1}</div>`).join('')}
+      ${answers.map((a,i)=>`<div style="width:28px;height:28px;border-radius:4px;border:1.5px solid ${i===cur?'var(--accent)':a!==null?'var(--success)':'var(--border)'};background:${i===cur?'var(--accent-light)':a!==null?'var(--success-light)':'var(--bg)'};display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;font-weight:600;color:${i===cur?'var(--accent)':a!==null?'var(--success)':'var(--text-tertiary)'}" onclick="TS.cur=${i};renderQ()">${i+1}</div>`).join('')}
     </div>`;
 }
 
-function selectAnswer(idx) {
-  testState.answers[testState.current] = idx;
-  renderTestQuestion();
-}
+function selAns(idx){TS.answers[TS.cur]=idx;renderQ();}
+function tNav(d){TS.cur=Math.max(0,Math.min(TS.questions.length-1,TS.cur+d));renderQ();}
 
-function testNav(dir) {
-  testState.current = Math.max(0, Math.min(testState.questions.length-1, testState.current+dir));
-  renderTestQuestion();
-}
-
-function submitTest() {
-  const { questions, answers, chapterId } = testState;
-  let correct = 0;
-  const wrongOriginalIdxs = [];
-  const ch = CHAPTERS.find(c => c.id === chapterId);
-
-  questions.forEach((q, i) => {
-    const origIdx = ch.questions.findIndex(oq => oq.q === q.q);
-    if (answers[i] === q.ans) correct++;
-    else if (origIdx !== -1) wrongOriginalIdxs.push(origIdx);
+async function submitTest(){
+  const{questions,answers,chId}=TS;
+  const ch=CHS.find(c=>c.id===chId);
+  let correct=0;const wrongIdx=[];
+  questions.forEach((q,i)=>{
+    const oi=ch.qs.findIndex(oq=>oq.q===q.q);
+    if(answers[i]===q.a)correct++;
+    else if(oi!==-1)wrongIdx.push(oi);
   });
+  const total=questions.length;
+  const score=Math.round((correct/total)*100);
+  const passed=score>=70;
 
-  const total = questions.length;
-  const score = Math.round((correct/total)*100);
-  const passed = score >= 70;
-
-  if (currentUser.role !== 'admin') {
-    const userData = getUserData();
-    if (!userData.progress) userData.progress = {};
-    if (!userData.scores) userData.scores = {};
-    if (!userData.previousWrong) userData.previousWrong = {};
-    if (!userData.attemptCount) userData.attemptCount = {};
-
-    if (passed) userData.progress[chapterId] = 'passed';
-    userData.scores[chapterId] = Math.max(userData.scores[chapterId] || 0, score);
-    userData.previousWrong[chapterId] = wrongOriginalIdxs;
-    userData.attemptCount[chapterId] = (userData.attemptCount[chapterId] || 0) + 1;
-    lsSet('user_' + currentUser.email, userData);
+  if(CU.role!=='admin'){
+    const ud=await getUD();
+    if(!ud.progress)ud.progress={};
+    if(!ud.scores)ud.scores={};
+    if(!ud.previousWrong)ud.previousWrong={};
+    if(!ud.attemptCount)ud.attemptCount={};
+    if(passed)ud.progress[chId]='passed';
+    ud.scores[chId]=Math.max(ud.scores[chId]||0,score);
+    ud.previousWrong[chId]=wrongIdx;
+    ud.attemptCount[chId]=(ud.attemptCount[chId]||0)+1;
+    await fbSet('mk_academy/users/'+sk(CU.email),ud);
   }
-
-  renderTestResult(score, correct, total, passed, chapterId);
-  renderSidebar();
+  renderResult(score,correct,total,passed,chId);
+  renderSB();
 }
 
-function renderTestResult(score, correct, total, passed, chapterId) {
-  const ch = CHAPTERS.find(c => c.id === chapterId);
-  const nextCh = CHAPTERS.find(c => c.id === chapterId+1);
-  const inner = document.getElementById('content-inner');
-  setTopbarSection('Test Result — ' + ch.title);
-
-  inner.innerHTML = `
-    <div class="card result-card">
+function renderResult(score,correct,total,passed,chId){
+  const ch=CHS.find(c=>c.id===chId);
+  const next=CHS.find(c=>c.id===chId+1);
+  setTS('Test Result — '+ch.t);
+  document.getElementById('ci').innerHTML=`
+    <div class="card res-card">
       <div style="font-size:48px">${passed?'🎉':'💪'}</div>
-      <div class="result-score ${passed?'pass':'fail'}">${score}%</div>
+      <div class="res-score ${passed?'pass':'fail'}">${score}%</div>
       <div style="font-size:18px;font-weight:600;margin-bottom:8px">${passed?'Chapter passed!':'Not quite — try again.'}</div>
       <div style="font-size:14px;color:var(--text-secondary);margin-bottom:24px">${passed
-        ? `You scored ${score}% — above the 70% pass mark. ${nextCh ? 'Chapter '+nextCh.id+' — '+nextCh.title+' is now unlocked!' : 'You\'ve completed the entire MK Marketing Academy! 🏆'}`
-        : `You scored ${score}% — you need 70% to pass. Review the chapter content and retry. Your next attempt will include questions you got wrong mixed with new ones.`}</div>
-      <div class="result-details">
-        <div class="result-stat"><div class="result-stat-val" style="color:var(--success)">${correct}</div><div class="result-stat-lab">Correct</div></div>
-        <div class="result-stat"><div class="result-stat-val" style="color:var(--error)">${total-correct}</div><div class="result-stat-lab">Incorrect</div></div>
-        <div class="result-stat"><div class="result-stat-val">${total}</div><div class="result-stat-lab">Total</div></div>
+        ?`You scored ${score}% — above the 70% pass mark. ${next?'Chapter '+next.id+' — '+next.t+' is now unlocked!':'You\'ve completed the entire MK Marketing Academy! 🏆'}`
+        :`You scored ${score}% — need 70% to pass. Review the chapter and retry. Your next attempt will include questions you got wrong mixed with new ones.`}</div>
+      <div class="res-stats">
+        <div class="res-stat"><div class="res-stat-val" style="color:var(--success)">${correct}</div><div class="res-stat-lab">Correct</div></div>
+        <div class="res-stat"><div class="res-stat-val" style="color:var(--error)">${total-correct}</div><div class="res-stat-lab">Incorrect</div></div>
+        <div class="res-stat"><div class="res-stat-val">${total}</div><div class="res-stat-lab">Total</div></div>
       </div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-secondary btn-sm" onclick="selectChapter(${chapterId})">← Back to chapter</button>
-        ${!passed ? `<button class="btn btn-primary btn-sm" onclick="startTest(${chapterId})">Retry test →</button>` : ''}
-        ${passed && nextCh ? `<button class="btn btn-success btn-sm" onclick="selectChapter(${nextCh.id})">Next: ${nextCh.title} →</button>` : ''}
-        ${passed && !nextCh ? `<button class="btn btn-success btn-sm" onclick="showDashboard()">View dashboard 🏆</button>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="selCh(${chId})">← Back to chapter</button>
+        ${!passed?`<button class="btn btn-primary btn-sm" onclick="startTest(${chId})">Retry test →</button>`:''}
+        ${passed&&next?`<button class="btn btn-success btn-sm" onclick="selCh(${next.id})">Next: ${next.t} →</button>`:''}
+        ${passed&&!next?`<button class="btn btn-success btn-sm" onclick="showDash()">View dashboard 🏆</button>`:''}
       </div>
     </div>`;
 }
 
-// ═══════════════════════════════════════════
-// ADMIN PANEL
-// ═══════════════════════════════════════════
-function renderAdminPanel() {
-  setTopbarSection('Admin Panel');
-  const inner = document.getElementById('content-inner');
-  const idx = lsGet('users_index') || [];
-  const allUsers = idx.map(email => lsGet('user_' + email)).filter(Boolean);
-  const pending = allUsers.filter(u => !u.approved && !u.removed);
-  const active = allUsers.filter(u => u.approved && !u.removed);
+// ─── ADMIN PANEL ─────────────────────────────────────────────
+async function renderAdmin(){
+  setTS('Admin Panel');
+  const ci=document.getElementById('ci');
+  ci.innerHTML='<div class="loading">Loading team data...</div>';
+  const usersObj=await fbGet('mk_academy/users')||{};
+  const allUsers=Object.values(usersObj).filter(u=>!u.removed);
+  const pending=allUsers.filter(u=>!u.approved);
+  const active=allUsers.filter(u=>u.approved);
 
-  inner.innerHTML = `
-    <div class="page-eyebrow">Administration</div>
+  ci.innerHTML=`
+    <div class="eyebrow">Administration</div>
     <div class="page-title">Team Management</div>
-    <div class="page-subtitle">Manage team member access, approve accounts, and track chapter progress.</div>
-    <div class="admin-tabs">
-      <div class="admin-tab ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdminPanel()">Active Members (${active.length})</div>
-      <div class="admin-tab ${adminTab==='pending'?'active':''}" onclick="adminTab='pending';renderAdminPanel()">Pending Approval (${pending.length})</div>
-      <div class="admin-tab ${adminTab==='add'?'active':''}" onclick="adminTab='add';renderAdminPanel()">Add Member</div>
+    <div class="page-sub">Manage team member access, approve accounts, and track chapter progress across your marketing team.</div>
+    <div class="adm-tabs">
+      <div class="adm-tab ${AT==='users'?'active':''}" onclick="AT='users';renderAdmin()">Active Members (${active.length})</div>
+      <div class="adm-tab ${AT==='pending'?'active':''}" onclick="AT='pending';renderAdmin()">Pending Approval (${pending.length})</div>
+      <div class="adm-tab ${AT==='add'?'active':''}" onclick="AT='add';renderAdmin()">Add Member</div>
     </div>
-    <div id="admin-content"></div>`;
+    <div id="adm-content"></div>`;
 
-  const container = document.getElementById('admin-content');
-  if (!container) return;
+  const ac=document.getElementById('adm-content');
+  if(!ac)return;
 
-  if (adminTab === 'add') {
-    container.innerHTML = `
-      <div class="invite-form">
+  if(AT==='add'){
+    ac.innerHTML=`
+      <div class="inv-form">
         <h3 style="font-size:15px;font-weight:600;margin-bottom:4px">➕ Add a team member</h3>
-        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Create an account for a new team member — approved and active immediately.</p>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Create an account — approved and active immediately.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div class="field" style="margin:0"><label>Full name</label><input type="text" id="inv-name" placeholder="Team member name"></div>
-          <div class="field" style="margin:0"><label>Email</label><input type="email" id="inv-email" placeholder="their@email.com"></div>
+          <div class="field" style="margin:0"><label>Full name</label><input type="text" id="in" placeholder="Team member name"></div>
+          <div class="field" style="margin:0"><label>Email</label><input type="email" id="ie" placeholder="their@email.com"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-          <div class="field" style="margin:0"><label>Temporary password</label><input type="text" id="inv-pass" placeholder="min 6 characters" value="mk2026"></div>
+          <div class="field" style="margin:0"><label>Temporary password</label><input type="text" id="ip" value="mk2026" placeholder="min 6 characters"></div>
           <div class="field" style="margin:0"><label>Chapter access</label>
-            <select id="inv-chapter">
-              <option value="1">Chapter 1 only (default)</option>
-              <option value="all">All chapters unlocked</option>
-            </select>
+            <select id="ia"><option value="1">Chapter 1 only (default)</option><option value="all">All chapters unlocked</option></select>
           </div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="addMember()" style="width:auto">Create account →</button>
-        <div id="inv-msg"></div>
+        <div id="imsg"></div>
       </div>`;
     return;
   }
 
-  const list = adminTab === 'pending' ? pending : active;
-
-  if (list.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div style="font-size:32px;margin-bottom:12px">${adminTab==='pending'?'✅':'👥'}</div>${adminTab==='pending'?'No pending approvals.':'No active team members yet. Add some using the Add Member tab.'}</div>`;
+  const list=AT==='pending'?pending:active;
+  if(list.length===0){
+    ac.innerHTML=`<div class="empty"><div style="font-size:32px;margin-bottom:12px">${AT==='pending'?'✅':'👥'}</div>${AT==='pending'?'No pending approvals — all accounts are active.':'No active team members yet. Add some using the Add Member tab.'}</div>`;
     return;
   }
 
-  container.innerHTML = `<div style="overflow-x:auto"><table class="table">
-    <thead><tr>
-      <th>Name</th><th>Email</th><th>Progress</th><th>Best Scores</th><th>Actions</th>
-    </tr></thead>
+  ac.innerHTML=`<div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>Name</th><th>Email</th><th>Progress</th><th>Best Scores</th><th>Actions</th></tr></thead>
     <tbody>
-      ${list.map(u => {
-        const progress = u.progress || {};
-        const scores = u.scores || {};
-        const passedCount = Object.values(progress).filter(v=>v==='passed').length;
-        const pills = CHAPTERS.map(ch => {
-          const p = progress[ch.id]; const s = scores[ch.id];
-          return `<div class="chapter-pill ${p==='passed'?'pill-pass':s?'pill-fail':'pill-none'}" title="Ch${ch.id}: ${p==='passed'?'Passed '+s+'%':s?'Failed '+s+'%':'Not attempted'}">${ch.id}</div>`;
-        }).join('');
-        const scoreStr = CHAPTERS.map(ch => scores[ch.id] ? `Ch${ch.id}: ${scores[ch.id]}%` : '').filter(Boolean).join(' · ') || 'None yet';
-        return `<tr>
+      ${list.map(u=>{
+        const prog=u.progress||{};const scores=u.scores||{};
+        const pc=Object.values(prog).filter(v=>v==='passed').length;
+        const pills=CHS.map(ch=>{const p=prog[ch.id];const s=scores[ch.id];return`<div class="pill ${p==='passed'?'pill-p':s?'pill-f':'pill-n'}" title="Ch${ch.id}: ${p==='passed'?'Passed '+s+'%':s?'Failed '+s+'%':'Not attempted'}">${ch.id}</div>`;}).join('');
+        const scoreStr=CHS.map(ch=>scores[ch.id]?`Ch${ch.id}: ${scores[ch.id]}%`:'').filter(Boolean).join(' · ')||'None yet';
+        return`<tr>
           <td><strong>${u.name}</strong></td>
           <td style="color:var(--text-secondary);font-size:13px">${u.email}</td>
-          <td>
-            <div class="progress-mini">
-              <div class="progress-mini-bar"><div class="progress-mini-fill" style="width:${(passedCount/5)*100}%"></div></div>
-              <span style="font-size:12px;color:var(--text-secondary);white-space:nowrap">${passedCount}/5</span>
-            </div>
-            <div class="chapter-pills">${pills}</div>
-          </td>
+          <td><div class="pm"><div class="pm-bar"><div class="pm-fill" style="width:${(pc/5)*100}%"></div></div><span style="font-size:12px;color:var(--text-secondary);white-space:nowrap">${pc}/5</span></div><div class="pills">${pills}</div></td>
           <td style="font-size:12px;color:var(--text-secondary)">${scoreStr}</td>
-          <td>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              ${!u.approved ? `<button class="btn btn-success btn-sm" onclick="approveUser('${u.email}')">Approve ✓</button>` : ''}
-              <button class="btn btn-secondary btn-sm" onclick="resetProgress('${u.email}')">Reset</button>
-              <button class="btn btn-danger btn-sm" onclick="removeUser('${u.email}')">Remove</button>
-            </div>
-          </td>
+          <td><div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${!u.approved?`<button class="btn btn-success btn-sm" onclick="approveUser('${sk(u.email)}')">Approve ✓</button>`:''}
+            <button class="btn btn-secondary btn-sm" onclick="resetUser('${sk(u.email)}')">Reset</button>
+            <button class="btn btn-danger btn-sm" onclick="removeUser('${sk(u.email)}')">Remove</button>
+          </div></td>
         </tr>`;
       }).join('')}
     </tbody>
   </table></div>`;
 }
 
-function addMember() {
-  const name = document.getElementById('inv-name').value.trim();
-  const email = document.getElementById('inv-email').value.trim().toLowerCase();
-  const pass = document.getElementById('inv-pass').value;
-  const access = document.getElementById('inv-chapter').value;
-  const msgEl = document.getElementById('inv-msg');
-
-  if (!name||!email||!pass) { msgEl.innerHTML='<div class="inline-msg error">Please fill all fields.</div>'; return; }
-  if (pass.length<6) { msgEl.innerHTML='<div class="inline-msg error">Password must be at least 6 characters.</div>'; return; }
-  if (lsGet('user_'+email)) { msgEl.innerHTML='<div class="inline-msg error">An account with this email already exists.</div>'; return; }
-
-  let progress = {};
-  if (access === 'all') { CHAPTERS.forEach(ch => { progress[ch.id] = 'passed'; }); }
-
-  lsSet('user_'+email, { name, email, password: pass, approved: true, createdAt: Date.now(), progress, scores: {}, previousWrong: {}, attemptCount: {} });
-
-  const idx = lsGet('users_index') || [];
-  if (!idx.includes(email)) { idx.push(email); lsSet('users_index', idx); }
-
-  msgEl.innerHTML = `<div class="inline-msg success">✓ Account created for ${name}. Credentials: ${email} / ${pass}</div>`;
-  document.getElementById('inv-name').value = '';
-  document.getElementById('inv-email').value = '';
+async function addMember(){
+  const name=document.getElementById('in').value.trim();
+  const email=document.getElementById('ie').value.trim().toLowerCase();
+  const pass=document.getElementById('ip').value;
+  const access=document.getElementById('ia').value;
+  const msg=document.getElementById('imsg');
+  if(!name||!email||!pass){msg.innerHTML='<div class="imsg e">Please fill all fields.</div>';return;}
+  if(pass.length<6){msg.innerHTML='<div class="imsg e">Password must be at least 6 characters.</div>';return;}
+  const existing=await fbGet('mk_academy/users/'+sk(email));
+  if(existing){msg.innerHTML='<div class="imsg e">An account with this email already exists.</div>';return;}
+  let progress={};
+  if(access==='all')CHS.forEach(ch=>{progress[ch.id]='passed';});
+  await fbSet('mk_academy/users/'+sk(email),{name,email,password:pass,approved:true,createdAt:Date.now(),progress,scores:{},previousWrong:{},attemptCount:{}});
+  msg.innerHTML=`<div class="imsg s">✓ Account created for ${name}. Login: ${email} / ${pass}</div>`;
+  document.getElementById('in').value='';
+  document.getElementById('ie').value='';
 }
 
-function approveUser(email) {
-  const u = lsGet('user_'+email);
-  if (u) { u.approved = true; lsSet('user_'+email, u); }
-  renderAdminPanel();
+async function approveUser(safeKey){
+  const u=await fbGet('mk_academy/users/'+safeKey);
+  if(u){u.approved=true;await fbSet('mk_academy/users/'+safeKey,u);}
+  renderAdmin();
+}
+async function resetUser(safeKey){
+  if(!confirm('Reset all progress for this user?'))return;
+  const u=await fbGet('mk_academy/users/'+safeKey);
+  if(u){u.progress={};u.scores={};u.previousWrong={};u.attemptCount={};await fbSet('mk_academy/users/'+safeKey,u);}
+  renderAdmin();
+}
+async function removeUser(safeKey){
+  if(!confirm('Remove this user from the academy?'))return;
+  const u=await fbGet('mk_academy/users/'+safeKey);
+  if(u){u.removed=true;u.approved=false;await fbSet('mk_academy/users/'+safeKey,u);}
+  renderAdmin();
 }
 
-function resetProgress(email) {
-  if (!confirm('Reset all progress for this user? This cannot be undone.')) return;
-  const u = lsGet('user_'+email);
-  if (u) { u.progress = {}; u.scores = {}; u.previousWrong = {}; u.attemptCount = {}; lsSet('user_'+email, u); }
-  renderAdminPanel();
-}
-
-function removeUser(email) {
-  if (!confirm('Remove ' + email + ' from the academy?')) return;
-  const u = lsGet('user_'+email);
-  if (u) { u.removed = true; u.approved = false; lsSet('user_'+email, u); }
-  renderAdminPanel();
-}
-
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
+// ─── INIT ────────────────────────────────────────────────────
 initAdmin();
 </script>
 </body>
