@@ -145,6 +145,7 @@ select:focus{border-color:var(--accent)}
       <div class="field"><label>Email</label><input type="email" id="le" placeholder="you@millionskart.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="field"><label>Password</label><input type="password" id="lp" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="btn btn-primary" onclick="doLogin()">Sign in →</button>
+      <p style="font-size:13px;color:var(--text-secondary);margin-top:12px;text-align:center"><span style="color:var(--accent);cursor:pointer" onclick="showForgotPw()">Forgot password?</span></p>
     </div>
     <div id="signup-form" style="display:none">
       <div class="field"><label>Full name</label><input type="text" id="sn" placeholder="Your full name"></div>
@@ -152,6 +153,28 @@ select:focus{border-color:var(--accent)}
       <div class="field"><label>Password</label><input type="password" id="sp" placeholder="Min 6 characters"></div>
       <button class="btn btn-primary" onclick="doSignup()">Create account →</button>
       <p style="font-size:12px;color:var(--text-tertiary);margin-top:12px;line-height:1.6">Your account needs admin approval before you can access course content.</p>
+    </div>
+    <div id="forgot-form" style="display:none">
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6">Enter your registered email and we'll confirm your account. Then contact your admin to get a new password.</p>
+      <div class="field"><label>Email</label><input type="email" id="fp-email" placeholder="you@millionskart.com" onkeydown="if(event.key==='Enter')doForgotPw()"></div>
+      <button class="btn btn-primary" onclick="doForgotPw()">Send reset request</button>
+      <p style="font-size:13px;color:var(--text-secondary);margin-top:12px;text-align:center"><span style="color:var(--accent);cursor:pointer" onclick="backToLogin()">← Back to sign in</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="pw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px 28px;width:380px;box-shadow:var(--shadow-lg)">
+    <div style="font-size:17px;font-weight:600;margin-bottom:6px">Change Password</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">Update your account password below.</div>
+    <div id="pw-modal-msg" style="display:none;margin-bottom:12px"></div>
+    <div class="field"><label>Current password</label><input type="password" id="cp-old" placeholder="Your current password"></div>
+    <div class="field"><label>New password</label><input type="password" id="cp-new" placeholder="Min 6 characters"></div>
+    <div class="field"><label>Confirm new password</label><input type="password" id="cp-confirm" placeholder="Repeat new password"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-primary btn-sm" onclick="doChangePw()">Update password</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeChangePwModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -169,6 +192,7 @@ select:focus{border-color:var(--accent)}
         <div class="user-avatar" id="ua">?</div>
         <div><div style="font-size:13px;font-weight:500" id="un">—</div><div style="font-size:11px;color:var(--text-tertiary)" id="ur">—</div></div>
       </div>
+      <button class="btn btn-secondary btn-sm" onclick="showChangePwModal()">Change password</button>
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
     </div>
   </div>
@@ -755,7 +779,8 @@ async function renderAdmin(){
           <td style="font-size:12px;color:var(--text-secondary)">${scoreStr}</td>
           <td><div style="display:flex;gap:6px;flex-wrap:wrap">
             ${!u.approved?`<button class="btn btn-success btn-sm" onclick="approveUser('${sk(u.email)}')">Approve ✓</button>`:''}
-            <button class="btn btn-secondary btn-sm" onclick="resetUser('${sk(u.email)}')">Reset</button>
+            <button class="btn btn-secondary btn-sm" onclick="setUserPw('${sk(u.email)}','${u.name}')">Set password</button>
+            <button class="btn btn-secondary btn-sm" onclick="resetUser('${sk(u.email)}')">Reset progress</button>
             <button class="btn btn-danger btn-sm" onclick="removeUser('${sk(u.email)}')">Remove</button>
           </div></td>
         </tr>`;
@@ -798,6 +823,74 @@ async function removeUser(safeKey){
   const u=await fbGet('mk_academy/users/'+safeKey);
   if(u){u.removed=true;u.approved=false;await fbSet('mk_academy/users/'+safeKey,u);}
   renderAdmin();
+}
+
+// ─── PASSWORD RESET ──────────────────────────────────────────
+function showForgotPw(){
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('signup-form').style.display='none';
+  document.getElementById('forgot-form').style.display='block';
+  document.getElementById('auth-msg').style.display='none';
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+}
+function backToLogin(){
+  document.getElementById('forgot-form').style.display='none';
+  switchTab('login');
+}
+async function doForgotPw(){
+  const email=document.getElementById('fp-email').value.trim().toLowerCase();
+  if(!email){showMsg('Please enter your email address.','error');return;}
+  const user=await fbGet('mk_academy/users/'+sk(email));
+  if(!user){showMsg('No account found with this email.','error');return;}
+  showMsg('Account confirmed. Please contact admin@millionskart.com to get your password reset.','success');
+}
+function showChangePwModal(){
+  const m=document.getElementById('pw-modal');
+  m.style.display='flex';
+  document.getElementById('cp-old').value='';
+  document.getElementById('cp-new').value='';
+  document.getElementById('cp-confirm').value='';
+  document.getElementById('pw-modal-msg').style.display='none';
+}
+function closeChangePwModal(){document.getElementById('pw-modal').style.display='none';}
+function pwModalMsg(msg,type){
+  const el=document.getElementById('pw-modal-msg');
+  el.className='auth-msg '+type;
+  el.textContent=msg;
+  el.style.display='block';
+}
+async function doChangePw(){
+  const oldPw=document.getElementById('cp-old').value;
+  const newPw=document.getElementById('cp-new').value;
+  const confirmPw=document.getElementById('cp-confirm').value;
+  if(!oldPw||!newPw||!confirmPw){pwModalMsg('Please fill in all fields.','error');return;}
+  if(newPw.length<6){pwModalMsg('New password must be at least 6 characters.','error');return;}
+  if(newPw!==confirmPw){pwModalMsg('New passwords do not match.','error');return;}
+  try{
+    if(CU.role==='admin'){
+      const admin=await fbGet('mk_academy/admin');
+      if(admin.password!==oldPw){pwModalMsg('Current password is incorrect.','error');return;}
+      admin.password=newPw;
+      await fbSet('mk_academy/admin',admin);
+    }else{
+      const ud=await getUD();
+      if(ud.password!==oldPw){pwModalMsg('Current password is incorrect.','error');return;}
+      ud.password=newPw;
+      await fbSet('mk_academy/users/'+sk(CU.email),ud);
+    }
+    pwModalMsg('Password updated successfully!','success');
+    setTimeout(closeChangePwModal,1500);
+  }catch(e){pwModalMsg('Error updating password. Please try again.','error');}
+}
+async function setUserPw(safeKey,name){
+  const newPw=prompt('Set new password for '+name+':\n(minimum 6 characters)');
+  if(newPw===null)return;
+  if(!newPw||newPw.length<6){alert('Password must be at least 6 characters.');return;}
+  try{
+    const u=await fbGet('mk_academy/users/'+safeKey);
+    if(u){u.password=newPw;await fbSet('mk_academy/users/'+safeKey,u);}
+    alert('✓ Password updated for '+name+'.\nNew password: '+newPw);
+  }catch(e){alert('Error updating password. Please try again.');}
 }
 
 // ─── INIT ────────────────────────────────────────────────────
